@@ -11,9 +11,16 @@ export class InstrumentRepositoryImpl implements InstrumentRepository {
     @Inject(DATABASE_CONNECTION) private readonly database: Kysely<DB>,
   ) {}
 
-  async getInstrument(
-    instrumentId: Instrument['id'],
-  ): Promise<Instrument | null> {
+  async findAll(): Promise<Instrument[]> {
+    const data = await this.database
+      .selectFrom('instruments')
+      .selectAll()
+      .execute();
+
+    return data.map((item) => this.mapDbToDomain(item));
+  }
+
+  async findById(instrumentId: Instrument['id']): Promise<Instrument | null> {
     const data = await this.database
       .selectFrom('instruments')
       .where('id', '=', parseInt(instrumentId))

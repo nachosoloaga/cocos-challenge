@@ -11,7 +11,13 @@ export class OrderRepositoryImpl implements OrderRepository {
     @Inject(DATABASE_CONNECTION) private readonly database: Kysely<DB>,
   ) {}
 
-  async getOrder(orderId: Order['id']): Promise<Order | null> {
+  async findAll(): Promise<Order[]> {
+    const data = await this.database.selectFrom('orders').selectAll().execute();
+
+    return data.map((item) => this.mapDbToDomain(item));
+  }
+
+  async findById(orderId: Order['id']): Promise<Order | null> {
     const data = await this.database
       .selectFrom('orders')
       .where('id', '=', parseInt(orderId))

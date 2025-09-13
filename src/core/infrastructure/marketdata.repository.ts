@@ -11,9 +11,16 @@ export class MarketdataRepositoryImpl implements MarketdataRepository {
     @Inject(DATABASE_CONNECTION) private readonly database: Kysely<DB>,
   ) {}
 
-  async getMarketdata(
-    marketdataId: Marketdata['id'],
-  ): Promise<Marketdata | null> {
+  async findAll(): Promise<Marketdata[]> {
+    const data = await this.database
+      .selectFrom('marketdata')
+      .selectAll()
+      .execute();
+
+    return data.map((item) => this.mapDbToDomain(item));
+  }
+
+  async findById(marketdataId: Marketdata['id']): Promise<Marketdata | null> {
     const data = await this.database
       .selectFrom('marketdata')
       .where('id', '=', parseInt(marketdataId))
