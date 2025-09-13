@@ -58,4 +58,35 @@ export class Marketdata {
     public getDatetime(): string {
         return this.datetime;
     }
+
+    static fromDb({
+        id,
+        instrumentid,
+        high,
+        low,
+        open,
+        close,
+        previousclose,
+        date
+    }: {
+        id: number;
+        instrumentid: number;
+        high: number;
+        low: number;
+        open: number;
+        close: number;
+        previousclose: number;
+        date: Date;
+    }): Marketdata {
+        return new Marketdata(
+            id.toString(),
+            instrumentid.toString(),
+            Number(high),
+            Number(low),
+            Number(open),
+            Number(close),
+            Number(previousclose),
+            date.toISOString()
+        );
+    }
 }

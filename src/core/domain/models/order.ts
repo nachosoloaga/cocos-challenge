@@ -25,6 +25,8 @@ export class Order {
         this.size = size;
         this.price = price;
         this.type = type;
+        this.status = status;
+        this.datetime = datetime;
     }
 
     public getId(): string {
@@ -61,5 +63,39 @@ export class Order {
 
     public getDatetime(): string {
         return this.datetime;
+    }
+
+    static fromDb({
+        id,
+        instrumentid,
+        userid,
+        side,
+        size,
+        price,
+        type,
+        status,
+        datetime
+    }: {
+        id: number;
+        instrumentid: number;
+        userid: number;
+        side: string;
+        size: number;
+        price: number;
+        type: string;
+        status: string;
+        datetime: Date;
+    }): Order {
+        return new Order(
+            id.toString(),
+            instrumentid.toString(),
+            userid.toString(),
+            side,
+            size,
+            Number(price),
+            type,
+            status,
+            datetime.toISOString()
+        );
     }
 }

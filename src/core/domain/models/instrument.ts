@@ -29,4 +29,18 @@ export class Instrument {
     public getType(): string {
         return this.type;
     }
+
+    static fromDb({
+        id,
+        ticker,
+        name,
+        type
+    }: {
+        id: number;
+        ticker: string;
+        name: string;
+        type: string;
+    }): Instrument {
+        return new Instrument(id.toString(), ticker, name, type);
+    }
 }
