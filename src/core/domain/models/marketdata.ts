@@ -1,92 +1,101 @@
 // - **marketdata**: id, instrumentId, high, low, open, close, previousClose, datetime
 export class Marketdata {
-    private id: string;
+  private id: string;
 
-    private instrumentId: string;
+  private instrumentId: string;
 
-    private high: number;
+  private high: number;
 
-    private low: number;
+  private low: number;
 
-    private open: number;
+  private open: number;
 
-    private close: number;
+  private close: number;
 
-    private previousClose: number;
+  private previousClose: number;
 
-    private datetime: string;
-    
-    constructor(id: string, instrumentId: string, high: number, low: number, open: number, close: number, previousClose: number, datetime: string) {
-        this.id = id;
-        this.instrumentId = instrumentId;
-        this.high = high;
-        this.low = low;
-        this.open = open;
-        this.close = close;
-        this.previousClose = previousClose;
-        this.datetime = datetime;
-    }
+  private datetime: string;
 
-    public getId(): string {
-        return this.id;
-    }
+  constructor(
+    id: string,
+    instrumentId: string,
+    high: number,
+    low: number,
+    open: number,
+    close: number,
+    previousClose: number,
+    datetime: string,
+  ) {
+    this.id = id;
+    this.instrumentId = instrumentId;
+    this.high = high;
+    this.low = low;
+    this.open = open;
+    this.close = close;
+    this.previousClose = previousClose;
+    this.datetime = datetime;
+  }
 
-    public getInstrumentId(): string {
-        return this.instrumentId;
-    }
-    
-    public getHigh(): number {
-        return this.high;
-    }
+  public getId(): string {
+    return this.id;
+  }
 
-    public getLow(): number {
-        return this.low;
-    }
-    
-    public getOpen(): number {
-        return this.open;
-    }
+  public getInstrumentId(): string {
+    return this.instrumentId;
+  }
 
-    public getClose(): number {
-        return this.close;
-    }
-    
-    public getPreviousClose(): number {
-        return this.previousClose;
-    }
+  public getHigh(): number {
+    return this.high;
+  }
 
-    public getDatetime(): string {
-        return this.datetime;
-    }
+  public getLow(): number {
+    return this.low;
+  }
 
-    static fromDb({
-        id,
-        instrumentid,
-        high,
-        low,
-        open,
-        close,
-        previousclose,
-        date
-    }: {
-        id: number;
-        instrumentid: number;
-        high: number;
-        low: number;
-        open: number;
-        close: number;
-        previousclose: number;
-        date: Date;
-    }): Marketdata {
-        return new Marketdata(
-            id.toString(),
-            instrumentid.toString(),
-            Number(high),
-            Number(low),
-            Number(open),
-            Number(close),
-            Number(previousclose),
-            date.toISOString()
-        );
-    }
+  public getOpen(): number {
+    return this.open;
+  }
+
+  public getClose(): number {
+    return this.close;
+  }
+
+  public getPreviousClose(): number {
+    return this.previousClose;
+  }
+
+  public getDatetime(): string {
+    return this.datetime;
+  }
+
+  static fromDb({
+    id,
+    instrumentid,
+    high,
+    low,
+    open,
+    close,
+    previousclose,
+    date,
+  }: {
+    id: number;
+    instrumentid: number;
+    high: number;
+    low: number;
+    open: number;
+    close: number;
+    previousclose: number;
+    date: Date;
+  }): Marketdata {
+    return new Marketdata(
+      id.toString(),
+      instrumentid.toString(),
+      Number(high),
+      Number(low),
+      Number(open),
+      Number(close),
+      Number(previousclose),
+      date.toISOString(),
+    );
+  }
 }

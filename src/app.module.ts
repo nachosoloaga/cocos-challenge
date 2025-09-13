@@ -3,9 +3,12 @@ import { CoreModule } from './core/core.module';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [CoreModule, ConfigModule.forRoot({
-    envFilePath: '.env',
-  })],
+  imports: [
+    CoreModule,
+    ConfigModule.forRoot({
+      envFilePath: '.env',
+    }),
+  ],
   controllers: [],
   providers: [],
 })

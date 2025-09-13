@@ -1,6 +1,6 @@
 import { Provider } from '@nestjs/common';
 import { Kysely } from 'kysely';
-import {  createDatabase } from './database.config';
+import { createDatabase } from './database.config';
 import { ConfigService } from '@nestjs/config';
 import { DB } from './database-types';
 
