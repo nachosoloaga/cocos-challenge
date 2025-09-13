@@ -1,17 +1,19 @@
+import { DB } from "src/database/database-types";
+
 export class User {
-    private id: string;
+    private id: number;
 
     private email: string;
 
-    private accountNumber: string;
+    private accountNumber: number;
 
-    constructor(id: string, email: string, accountNumber: string) {
+    constructor(id: number, email: string, accountNumber: number) {
         this.id = id;
         this.email = email;
         this.accountNumber = accountNumber;
     }
 
-    public getId(): string {
+    public getId(): number {
         return this.id;
     }
 
@@ -19,7 +21,19 @@ export class User {
         return this.email;
     }
 
-    public getAccountNumber(): string {
+    public getAccountNumber(): number {
         return this.accountNumber;
+    }
+
+    static fromDb({
+        id,
+        email,
+        accountnumber
+    }: {
+        id: number;
+        email: string;
+        accountnumber: number;
+    }): User {
+        return new User(id, email, accountnumber)
     }
 }

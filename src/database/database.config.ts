@@ -1,44 +1,11 @@
 import { Kysely, PostgresDialect } from 'kysely';
 import { Pool } from 'pg';
 import { ConfigService } from '@nestjs/config';
+import { DB } from './database-types';
 
-export interface Database {
-  users: {  
-    id: number;
-    email: string;
-    accountNumber: string;
-  };
-  instruments: {
-    id: number;
-    ticker: string;
-    name: string;
-    type: string;
-  };
-  orders: {
-    id: number;
-    instrumentId: number;
-    userId: number;
-    side: string;
-    size: number;
-    price: number | null;
-    type: string;
-    status: string;
-    datetime: Date;
-  };
-  marketdata: {
-    id: number;
-    instrumentId: number;
-    high: number;
-    low: number;
-    open: number;
-    close: number;
-    previousClose: number;
-    datetime: Date;
-  };
-}
 
-export const createDatabase = (configService: ConfigService): Kysely<Database> => {
-  return new Kysely<Database>({
+export const createDatabase = (configService: ConfigService): Kysely<DB> => {
+  return new Kysely<DB>({
     dialect: new PostgresDialect({
       pool: new Pool({
         host: process.env.DB_HOST,
