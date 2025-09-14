@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { DatabaseModule } from 'src/database/database.module';
 import { MarketApplicationService } from './application/services/market.service';
+import { UserController } from './api/users.controller';
 import { MarketController } from './api/market.controller';
-import { UserController } from './api/user.controller';
 import { UserApplicationService } from './application/services/user.service';
 import { UserRepositoryImpl } from './infrastructure/user.repository';
 import { USER_REPOSITORY } from './domain/repositories/user.repository';
@@ -17,7 +17,7 @@ import { PositionCalculatorService } from './domain/services/position-calculator
 
 @Module({
   imports: [DatabaseModule],
-  controllers: [MarketController, UserController],
+  controllers: [UserController, MarketController],
   providers: [
     MarketApplicationService,
     UserApplicationService,

@@ -4,6 +4,8 @@ export interface InstrumentRepository {
   findById(instrumentId: Instrument['id']): Promise<Instrument | null>;
 
   findAll(): Promise<Instrument[]>;
+
+  searchByTickerOrName(query: string): Promise<Instrument[]>;
 }
 
 export const INSTRUMENT_REPOSITORY = 'INSTRUMENT_REPOSITORY';

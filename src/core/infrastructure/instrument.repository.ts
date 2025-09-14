@@ -34,6 +34,23 @@ export class InstrumentRepositoryImpl implements InstrumentRepository {
     return this.mapDbToDomain(data);
   }
 
+  async searchByTickerOrName(query: string): Promise<Instrument[]> {
+    const searchTerm = `%${query.toLowerCase()}%`;
+
+    const data = await this.database
+      .selectFrom('instruments')
+      .where((eb) =>
+        eb.or([
+          eb('ticker', 'ilike', searchTerm),
+          eb('name', 'ilike', searchTerm),
+        ]),
+      )
+      .selectAll()
+      .execute();
+
+    return data.map((item) => this.mapDbToDomain(item));
+  }
+
   private mapDbToDomain(data: Record<string, unknown>) {
     return Instrument.fromDb({
       id: data.id as number,
