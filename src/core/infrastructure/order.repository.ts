@@ -4,6 +4,7 @@ import { DATABASE_CONNECTION } from 'src/database/database.provider';
 import { Kysely } from 'kysely';
 import { DB } from 'src/database/database-types';
 import { Order } from '../domain/models/order';
+import { Side } from '../domain/types/enums';
 
 @Injectable()
 export class OrderRepositoryImpl implements OrderRepository {
@@ -20,7 +21,7 @@ export class OrderRepositoryImpl implements OrderRepository {
   async findById(orderId: Order['id']): Promise<Order | null> {
     const data = await this.database
       .selectFrom('orders')
-      .where('id', '=', parseInt(orderId))
+      .where('id', '=', orderId)
       .selectAll()
       .executeTakeFirst();
 
@@ -31,12 +32,22 @@ export class OrderRepositoryImpl implements OrderRepository {
     return this.mapDbToDomain(data);
   }
 
+  async findByUserId(userId: Order['userId']): Promise<Order[]> {
+    const data = await this.database
+      .selectFrom('orders')
+      .where('userid', '=', userId)
+      .selectAll()
+      .execute();
+
+    return data.map((item) => this.mapDbToDomain(item));
+  }
+
   private mapDbToDomain(data: Record<string, unknown>) {
     return Order.fromDb({
       id: data.id as number,
       instrumentid: data.instrumentid as number,
       userid: data.userid as number,
-      side: data.side as string,
+      side: data.side as Side,
       size: data.size as number,
       price: data.price as number,
       type: data.type as string,

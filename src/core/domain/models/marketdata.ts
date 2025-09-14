@@ -1,6 +1,6 @@
 // - **marketdata**: id, instrumentId, high, low, open, close, previousClose, datetime
 export class Marketdata {
-  private id: string;
+  private id: number;
 
   private instrumentId: string;
 
@@ -17,7 +17,7 @@ export class Marketdata {
   private datetime: string;
 
   constructor(
-    id: string,
+    id: number,
     instrumentId: string,
     high: number,
     low: number,
@@ -36,7 +36,7 @@ export class Marketdata {
     this.datetime = datetime;
   }
 
-  public getId(): string {
+  public getId(): number {
     return this.id;
   }
 
@@ -88,7 +88,7 @@ export class Marketdata {
     date: Date;
   }): Marketdata {
     return new Marketdata(
-      id.toString(),
+      id,
       instrumentid.toString(),
       Number(high),
       Number(low),

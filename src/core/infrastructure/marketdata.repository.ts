@@ -23,7 +23,7 @@ export class MarketdataRepositoryImpl implements MarketdataRepository {
   async findById(marketdataId: Marketdata['id']): Promise<Marketdata | null> {
     const data = await this.database
       .selectFrom('marketdata')
-      .where('id', '=', parseInt(marketdataId))
+      .where('id', '=', marketdataId)
       .selectAll()
       .executeTakeFirst();
 

@@ -1,78 +1,88 @@
+import { Side } from '../types/enums';
+
 export class Order {
-  private id: string;
+  private _id: number;
 
-  private instrumentId: string;
+  private _instrumentId: number;
 
-  private userId: string;
+  private _userId: number;
 
-  private side: string;
+  private _side: Side;
 
-  private size: number;
+  private _size: number;
 
-  private price: number;
+  private _price: number;
 
-  private type: string;
+  private _type: string;
 
-  private status: string;
+  private _status: string;
 
-  private datetime: string;
+  private _datetime: string;
 
   constructor(
-    id: string,
-    instrumentId: string,
-    userId: string,
-    side: string,
+    id: number,
+    instrumentId: number,
+    userId: number,
+    side: Side,
     size: number,
     price: number,
     type: string,
     status: string,
     datetime: string,
   ) {
-    this.id = id;
-    this.instrumentId = instrumentId;
-    this.userId = userId;
-    this.side = side;
-    this.size = size;
-    this.price = price;
-    this.type = type;
-    this.status = status;
-    this.datetime = datetime;
+    this._id = id;
+    this._instrumentId = instrumentId;
+    this._userId = userId;
+    this._side = side;
+    this._size = size;
+    this._price = price;
+    this._type = type;
+    this._status = status;
+    this._datetime = datetime;
   }
 
-  public getId(): string {
-    return this.id;
+  public get id(): number {
+    return this._id;
   }
 
-  public getInstrumentId(): string {
-    return this.instrumentId;
+  public get instrumentId(): number {
+    return this._instrumentId;
   }
 
-  public getUserId(): string {
-    return this.userId;
+  public get userId(): number {
+    return this._userId;
   }
 
-  public getSide(): string {
-    return this.side;
+  public get side(): Side {
+    return this._side;
   }
 
-  public getSize(): number {
-    return this.size;
+  public get size(): number {
+    return this._size;
   }
 
-  public getPrice(): number {
-    return this.price;
+  public get price(): number {
+    return this._price;
   }
 
-  public getType(): string {
-    return this.type;
+  public get type(): string {
+    return this._type;
   }
 
-  public getStatus(): string {
-    return this.status;
+  public get status(): string {
+    return this._status;
   }
 
-  public getDatetime(): string {
-    return this.datetime;
+  public get datetime(): string {
+    return this._datetime;
+  }
+
+  public isFilled(): boolean {
+    return this._status === 'FILLED';
+  }
+
+  public isFiat(): boolean {
+    return this._side === Side.CASH_IN || this._side === Side.CASH_OUT;
   }
 
   static fromDb({
@@ -89,7 +99,7 @@ export class Order {
     id: number;
     instrumentid: number;
     userid: number;
-    side: string;
+    side: Side;
     size: number;
     price: number;
     type: string;
@@ -97,9 +107,9 @@ export class Order {
     datetime: Date;
   }): Order {
     return new Order(
-      id.toString(),
-      instrumentid.toString(),
-      userid.toString(),
+      id,
+      instrumentid,
+      userid,
       side,
       size,
       Number(price),

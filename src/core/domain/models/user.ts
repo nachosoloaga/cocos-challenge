@@ -1,28 +1,26 @@
-import { DB } from 'src/database/database-types';
-
 export class User {
-  private id: number;
+  private _id: number;
 
-  private email: string;
+  private _email: string;
 
-  private accountNumber: number;
+  private _accountNumber: number;
 
   constructor(id: number, email: string, accountNumber: number) {
-    this.id = id;
-    this.email = email;
-    this.accountNumber = accountNumber;
+    this._id = id;
+    this._email = email;
+    this._accountNumber = accountNumber;
   }
 
-  public getId(): number {
-    return this.id;
+  public get id(): number {
+    return this._id;
   }
 
-  public getEmail(): string {
-    return this.email;
+  public get email(): string {
+    return this._email;
   }
 
-  public getAccountNumber(): number {
-    return this.accountNumber;
+  public get accountNumber(): number {
+    return this._accountNumber;
   }
 
   static fromDb({

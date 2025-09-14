@@ -12,6 +12,8 @@ import { MarketdataRepositoryImpl } from './infrastructure/marketdata.repository
 import { MARKETDATA_REPOSITORY } from './domain/repositories/marketdata.repository';
 import { OrderRepositoryImpl } from './infrastructure/order.repository';
 import { ORDER_REPOSITORY } from './domain/repositories/order.repository';
+import { FiatCalculatorService } from './domain/services/fiat-calculator.service';
+import { PositionCalculatorService } from './domain/services/position-calculator.service';
 
 @Module({
   imports: [DatabaseModule],
@@ -19,6 +21,9 @@ import { ORDER_REPOSITORY } from './domain/repositories/order.repository';
   providers: [
     MarketApplicationService,
     UserApplicationService,
+    FiatCalculatorService,
+    PositionCalculatorService,
+    FiatCalculatorService,
     {
       provide: USER_REPOSITORY,
       useClass: UserRepositoryImpl,
