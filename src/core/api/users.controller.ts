@@ -1,7 +1,6 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { PortfolioApplicationService } from '../application/services/portfolio.service';
 import { PositionDto } from './dtos/position.dto';
-import { Position } from '../domain/models/position';
 
 @Controller('users')
 export class UserController {
@@ -12,30 +11,16 @@ export class UserController {
   @Get(':userId/portfolio')
   async getPortfolio(@Param('userId') userId: number): Promise<{
     positions: PositionDto[];
-    totalCashAmount: number;
+    totalCash: number;
     totalAccountValue: number;
   }> {
-    const { positionsMap, totalCashAmount, totalAccountValue } =
+    const { positions, totalCash, totalAccountValue } =
       await this.portfolioApplicationService.getPortfolio(userId);
 
     return {
-      positions: this.mapPositionsToDto(positionsMap),
-      totalCashAmount,
+      positions,
+      totalCash,
       totalAccountValue,
     };
-  }
-
-  mapPositionsToDto(positionsMap: Map<number, Position>): PositionDto[] {
-    const positions: PositionDto[] = [];
-    for (const [instrumentId, position] of positionsMap) {
-      positions.push({
-        instrumentId,
-        currentTotalValue: position.currentTotalValue,
-        totalReturnPercentage: position.totalReturnPercentage,
-        quantity: position.quantity,
-      });
-    }
-
-    return positions;
   }
 }

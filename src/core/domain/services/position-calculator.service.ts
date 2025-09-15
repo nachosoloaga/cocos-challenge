@@ -12,13 +12,12 @@ export class PositionCalculatorService {
     private readonly marketdataRepository: MarketdataRepository,
   ) {}
 
-  async calculatePositions(orders: Order[]): Promise<Map<number, Position>> {
+  async calculatePositions(orders: Order[]): Promise<Position[]> {
     const positionsMap = new Map<
       number,
       {
         quantity: number;
         totalCost: number;
-        averagePrice: number;
       }
     >();
 
@@ -27,7 +26,6 @@ export class PositionCalculatorService {
       const currentPosition = positionsMap.get(instrumentId) || {
         quantity: 0,
         totalCost: 0,
-        averagePrice: 0,
       };
 
       if (order.side === Side.BUY) {
@@ -50,8 +48,8 @@ export class PositionCalculatorService {
 
   async addMarketData(
     positions: Map<number, Partial<Position>>,
-  ): Promise<Map<number, Position>> {
-    const positionsWithMarketdata = new Map<number, Position>();
+  ): Promise<Position[]> {
+    const positionsWithMarketdata: Position[] = [];
 
     for (const [key, position] of positions) {
       const marketdata = await this.marketdataRepository.findOne(
@@ -70,10 +68,10 @@ export class PositionCalculatorService {
           ? Math.round((totalReturn / position.totalCost!) * 100 * 100) / 100
           : 0;
 
-      positionsWithMarketdata.set(key, {
+      positionsWithMarketdata.push({
+        instrumentId: key,
         quantity: position.quantity!,
         totalCost: position.totalCost!,
-        averagePrice: position.averagePrice!,
         totalReturn,
         totalReturnPercentage,
         currentTotalValue,

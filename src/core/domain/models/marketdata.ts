@@ -2,7 +2,7 @@
 export class Marketdata {
   private id: number;
 
-  private instrumentId: string;
+  private instrumentId: number;
 
   private high: number;
 
@@ -18,7 +18,7 @@ export class Marketdata {
 
   constructor(
     id: number,
-    instrumentId: string,
+    instrumentId: number,
     high: number,
     low: number,
     open: number,
@@ -40,7 +40,7 @@ export class Marketdata {
     return this.id;
   }
 
-  public getInstrumentId(): string {
+  public getInstrumentId(): number {
     return this.instrumentId;
   }
 
@@ -85,17 +85,17 @@ export class Marketdata {
     open: number;
     close: number;
     previousclose: number;
-    date: Date;
+    date: string;
   }): Marketdata {
     return new Marketdata(
       id,
-      instrumentid.toString(),
-      Number(high),
-      Number(low),
-      Number(open),
-      Number(close),
-      Number(previousclose),
-      date.toISOString(),
+      instrumentid,
+      high,
+      low,
+      open,
+      close,
+      previousclose,
+      date,
     );
   }
 }

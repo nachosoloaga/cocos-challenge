@@ -28,38 +28,33 @@ export class PortfolioApplicationService {
     const filledOrders = await this.orderRepository.find(
       OrderQueryObject.filledOrdersForUser(user.id),
     );
-    const totalCashAmount = this.getCashAmount(filledOrders);
-    const positionsMap = await this.getPositions(filledOrders);
-    const totalCurrentValueFromPositions =
-      this.getTotalCurrentValueFromPositions(positionsMap);
+    const totalCash = this.calculateCashAmount(filledOrders);
+    const positions = await this.calculatePositions(filledOrders);
+    const totalCurrentValueFromPositions = this.getTotalCurrentValue(positions);
 
     return {
-      positionsMap,
-      totalCashAmount,
-      totalAccountValue: totalCashAmount + totalCurrentValueFromPositions,
+      positions,
+      totalCash,
+      totalAccountValue: totalCash + totalCurrentValueFromPositions,
     };
   }
 
-  private getCashAmount(orders: Order[]): number {
+  private calculateCashAmount(orders: Order[]): number {
     const cashOrders = orders.filter((order) => order.isCash());
 
     return this.cashCalculatorService.calculateCashAmount(cashOrders);
   }
 
-  private async getPositions(orders: Order[]): Promise<Map<number, Position>> {
-    const stockOrders = orders.filter((order) => !order.isCash());
+  private async calculatePositions(orders: Order[]): Promise<Position[]> {
+    const stockOrders = orders.filter((order) => order.isStock());
 
     return this.positionCalculatorService.calculatePositions(stockOrders);
   }
 
-  private getTotalCurrentValueFromPositions(
-    positions: Map<number, Position>,
-  ): number {
-    let totalValueFromPositions = 0;
-    for (const position of positions.values()) {
-      totalValueFromPositions += position.currentTotalValue;
-    }
-
-    return totalValueFromPositions;
+  private getTotalCurrentValue(positions: Position[]): number {
+    return positions.reduce(
+      (acc, position) => acc + position.currentTotalValue,
+      0,
+    );
   }
 }

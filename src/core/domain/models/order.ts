@@ -81,6 +81,20 @@ export class Order {
     return this._side === Side.CASH_IN || this._side === Side.CASH_OUT;
   }
 
+  public isStock(): boolean {
+    return this._side === Side.BUY || this._side === Side.SELL;
+  }
+
+  public getCashAmount(): number {
+    if (this._side === Side.CASH_IN) {
+      return this._size * this._price;
+    } else if (this._side === Side.CASH_OUT) {
+      return -this._size * this._price;
+    }
+
+    return 0;
+  }
+
   static fromDb({
     id,
     instrumentid,

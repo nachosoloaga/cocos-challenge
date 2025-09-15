@@ -30,11 +30,11 @@ export class MarketdataRepositoryImpl implements MarketdataRepository {
 
   private buildQuery(
     query: MarketdataQueryObject,
-  ): SelectQueryBuilder<DB, 'orders', unknown> {
-    let qb = this.database.selectFrom('orders');
+  ): SelectQueryBuilder<DB, 'marketdata', unknown> {
+    let qb = this.database.selectFrom('marketdata');
 
-    if (query.datetime) {
-      qb = qb.where('datetime', '=', query.datetime);
+    if (query.date) {
+      qb = qb.where('date', '=', query.date);
     }
 
     if (query.instrumentId) {
@@ -57,7 +57,7 @@ export class MarketdataRepositoryImpl implements MarketdataRepository {
       open: data.open as number,
       close: data.close as number,
       previousclose: data.previousclose as number,
-      date: data.date as Date,
+      date: data.date as string,
     });
   }
 }
