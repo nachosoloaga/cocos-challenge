@@ -44,6 +44,31 @@ export class OrderRepositoryImpl implements OrderRepository {
     return qb;
   }
 
+  async save(order: Order): Promise<number> {
+    const dbOrder = this.mapDomainToDb(order);
+
+    const result = await this.database
+      .insertInto('orders')
+      .values(dbOrder)
+      .executeTakeFirstOrThrow();
+
+    return Number(result.insertId);
+  }
+
+  private mapDomainToDb(order: Order): Record<string, unknown> {
+    return {
+      id: order.id,
+      instrumentid: order.instrumentId,
+      userid: order.userId,
+      side: order.side,
+      size: order.size,
+      price: order.price,
+      type: order.type,
+      status: order.status,
+      datetime: order.datetime,
+    };
+  }
+
   private mapDbToDomain(data: Record<string, unknown>) {
     return Order.fromDb({
       id: data.id as number,

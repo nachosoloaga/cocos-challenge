@@ -20,6 +20,14 @@ export class InstrumentRepositoryImpl implements InstrumentRepository {
     return data.map((item) => this.mapDbToDomain(item));
   }
 
+  async findOne(query: InstrumentQueryObject): Promise<Instrument | null> {
+    const qb = this.buildQuery(query);
+
+    const data = await qb.selectAll().executeTakeFirst();
+
+    return data ? this.mapDbToDomain(data) : null;
+  }
+
   private buildQuery(
     query: InstrumentQueryObject,
   ): SelectQueryBuilder<DB, 'instruments', unknown> {

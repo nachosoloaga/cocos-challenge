@@ -1,7 +1,7 @@
 import { Side } from '../types/enums';
 
 export class Order {
-  private _id: number;
+  private _id: number | null;
 
   private _instrumentId: number;
 
@@ -20,7 +20,7 @@ export class Order {
   private _datetime: string;
 
   constructor(
-    id: number,
+    id: number | null,
     instrumentId: number,
     userId: number,
     side: Side,
@@ -41,7 +41,7 @@ export class Order {
     this._datetime = datetime;
   }
 
-  public get id(): number {
+  public get id(): number | null {
     return this._id;
   }
 
@@ -91,6 +91,15 @@ export class Order {
     } else if (this._side === Side.CASH_OUT) {
       return -this._size * this._price;
     }
+
+    // TODO: Do we need to handle this?
+    /*
+     } else if (order.side === Side.BUY) {
+        cashPosition -= order.size * order.price;
+      } else if (order.side === Side.SELL) {
+        cashPosition += order.size * order.price;
+      }
+    */
 
     return 0;
   }
