@@ -13,7 +13,7 @@ import { MARKETDATA_REPOSITORY } from './domain/repositories/marketdata.reposito
 import { OrderRepositoryImpl } from './infrastructure/order.repository';
 import { ORDER_REPOSITORY } from './domain/repositories/order.repository';
 import { CashCalculatorService } from './domain/services/cash-calculator.service';
-import { PositionCalculatorService } from './domain/services/position-calculator.service';
+import { StockPositionService } from './domain/services/position-calculator.service';
 
 @Module({
   imports: [DatabaseModule],
@@ -22,7 +22,7 @@ import { PositionCalculatorService } from './domain/services/position-calculator
     MarketApplicationService,
     PortfolioApplicationService,
     CashCalculatorService,
-    PositionCalculatorService,
+    StockPositionService,
     {
       provide: USER_REPOSITORY,
       useClass: UserRepositoryImpl,

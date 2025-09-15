@@ -4,9 +4,9 @@ import { USER_REPOSITORY } from 'src/core/domain/repositories/user.repository';
 import { OrderRepository } from 'src/core/domain/repositories/order.repository';
 import { ORDER_REPOSITORY } from 'src/core/domain/repositories/order.repository';
 import { CashCalculatorService } from 'src/core/domain/services/cash-calculator.service';
-import { PositionCalculatorService } from 'src/core/domain/services/position-calculator.service';
+import { StockPositionService } from 'src/core/domain/services/position-calculator.service';
 import { Order } from 'src/core/domain/models/order';
-import { Position } from 'src/core/domain/models/position';
+import { StockPosition } from 'src/core/domain/models/position';
 import { OrderQueryObject } from 'src/core/domain/queries/order.query-object';
 
 @Injectable()
@@ -15,7 +15,7 @@ export class PortfolioApplicationService {
     @Inject(USER_REPOSITORY) private readonly userRepository: UserRepository,
     @Inject(ORDER_REPOSITORY) private readonly orderRepository: OrderRepository,
     private readonly cashCalculatorService: CashCalculatorService,
-    private readonly positionCalculatorService: PositionCalculatorService,
+    private readonly stockPositionService: StockPositionService,
   ) {}
 
   async getPortfolio(userId: number) {
@@ -29,11 +29,11 @@ export class PortfolioApplicationService {
       OrderQueryObject.filledOrdersForUser(user.id),
     );
     const totalCash = this.calculateCashAmount(filledOrders);
-    const positions = await this.calculatePositions(filledOrders);
-    const totalCurrentValueFromPositions = this.getTotalCurrentValue(positions);
+    const { stockPositions, totalCurrentValueFromPositions } =
+      await this.calculateStockPositions(filledOrders);
 
     return {
-      positions,
+      stockPositions,
       totalCash,
       totalAccountValue: totalCash + totalCurrentValueFromPositions,
     };
@@ -45,16 +45,18 @@ export class PortfolioApplicationService {
     return this.cashCalculatorService.calculateCashAmount(cashOrders);
   }
 
-  private async calculatePositions(orders: Order[]): Promise<Position[]> {
+  private async calculateStockPositions(orders: Order[]): Promise<{
+    stockPositions: StockPosition[];
+    totalCurrentValueFromPositions: number;
+  }> {
     const stockOrders = orders.filter((order) => order.isStock());
 
-    return this.positionCalculatorService.calculatePositions(stockOrders);
-  }
+    const stockPositions =
+      await this.stockPositionService.calculateStockPositions(stockOrders);
 
-  private getTotalCurrentValue(positions: Position[]): number {
-    return positions.reduce(
-      (acc, position) => acc + position.currentTotalValue,
-      0,
-    );
+    const totalCurrentValueFromPositions =
+      this.stockPositionService.getTotalCurrentValue(stockPositions);
+
+    return { stockPositions, totalCurrentValueFromPositions };
   }
 }

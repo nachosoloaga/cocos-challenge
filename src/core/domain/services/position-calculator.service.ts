@@ -3,16 +3,16 @@ import { Order } from '../models/order';
 import { MarketdataRepository } from '../repositories/marketdata.repository';
 import { MARKETDATA_REPOSITORY } from '../repositories/marketdata.repository';
 import { Side } from '../types/enums';
-import { Position } from '../models/position';
+import { StockPosition } from '../models/position';
 import { MarketdataQueryObject } from '../queries/marketdata.query-object';
 
-export class PositionCalculatorService {
+export class StockPositionService {
   constructor(
     @Inject(MARKETDATA_REPOSITORY)
     private readonly marketdataRepository: MarketdataRepository,
   ) {}
 
-  async calculatePositions(orders: Order[]): Promise<Position[]> {
+  async calculateStockPositions(orders: Order[]): Promise<StockPosition[]> {
     const positionsMap = new Map<
       number,
       {
@@ -47,9 +47,9 @@ export class PositionCalculatorService {
   }
 
   async addMarketData(
-    positions: Map<number, Partial<Position>>,
-  ): Promise<Position[]> {
-    const positionsWithMarketdata: Position[] = [];
+    positions: Map<number, Partial<StockPosition>>,
+  ): Promise<StockPosition[]> {
+    const positionsWithMarketdata: StockPosition[] = [];
 
     for (const [key, position] of positions) {
       const marketdata = await this.marketdataRepository.findOne(
@@ -79,5 +79,12 @@ export class PositionCalculatorService {
     }
 
     return positionsWithMarketdata;
+  }
+
+  public getTotalCurrentValue(positions: StockPosition[]): number {
+    return positions.reduce(
+      (acc, position) => acc + position.currentTotalValue,
+      0,
+    );
   }
 }
