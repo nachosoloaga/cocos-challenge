@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateOrderDto } from 'src/core/api/dtos/createOrder.dto';
+import { CreateOrderDto } from 'src/core/api/dtos/create-order.request.dto';
 import { Order } from 'src/core/domain/models/order';
 import { InstrumentQueryObject } from 'src/core/domain/queries/instrument.query-object';
 import {

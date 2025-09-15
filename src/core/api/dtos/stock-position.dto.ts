@@ -1,4 +1,4 @@
-export interface PositionDto {
+export interface StockPositionDto {
   instrumentId: number;
   quantity: number;
   totalReturnPercentage: number;

@@ -1,6 +1,6 @@
 import { OrderType, Side } from 'src/core/domain/types/enums';
 
-export class CreateOrderDto {
+export class CreateOrderRequestDto {
   userId: number;
 
   instrumentId: number;

@@ -1,7 +1,7 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { MarketApplicationService } from '../application/services/market.service';
 import { InstrumentDto } from './dtos/instrument.dto';
-import { AssetSearchDto } from './dtos/assetSearch.dto';
+import { AssetSearchDto } from './dtos/asset-search.dto';
 import { Instrument } from '../domain/models/instrument';
 
 @Controller('market')
