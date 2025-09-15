@@ -1,8 +1,8 @@
 import { Order } from '../models/order';
 import { Side } from '../types/enums';
 
-export class FiatCalculatorService {
-  calculateFiatAmount(orders: Order[]): number {
+export class CashCalculatorService {
+  calculateCashAmount(orders: Order[]): number {
     return orders.reduce((acc, order) => {
       if (order.side === Side.CASH_IN) {
         return acc + order.size * order.price;

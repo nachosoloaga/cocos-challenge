@@ -1,10 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { OrderRepository } from '../domain/repositories/order.repository';
 import { DATABASE_CONNECTION } from 'src/database/database.provider';
-import { Kysely } from 'kysely';
+import { Kysely, SelectQueryBuilder } from 'kysely';
 import { DB } from 'src/database/database-types';
 import { Order } from '../domain/models/order';
 import { Side } from '../domain/types/enums';
+import { OrderQueryObject } from '../domain/queries/order.query-object';
 
 @Injectable()
 export class OrderRepositoryImpl implements OrderRepository {
@@ -12,34 +13,35 @@ export class OrderRepositoryImpl implements OrderRepository {
     @Inject(DATABASE_CONNECTION) private readonly database: Kysely<DB>,
   ) {}
 
-  async findAll(): Promise<Order[]> {
-    const data = await this.database.selectFrom('orders').selectAll().execute();
+  async find(query: OrderQueryObject): Promise<Order[]> {
+    const qb = this.buildQuery(query);
+    const data = await qb.selectAll().execute();
 
     return data.map((item) => this.mapDbToDomain(item));
   }
 
-  async findById(orderId: Order['id']): Promise<Order | null> {
-    const data = await this.database
-      .selectFrom('orders')
-      .where('id', '=', orderId)
-      .selectAll()
-      .executeTakeFirst();
+  private buildQuery(
+    query: OrderQueryObject,
+  ): SelectQueryBuilder<DB, 'orders', unknown> {
+    let qb = this.database.selectFrom('orders');
 
-    if (!data) {
-      return null;
+    if (query.userId) {
+      qb = qb.where('userid', '=', query.userId);
     }
 
-    return this.mapDbToDomain(data);
-  }
+    if (query.instrumentId) {
+      qb = qb.where('instrumentid', '=', query.instrumentId);
+    }
 
-  async findByUserId(userId: Order['userId']): Promise<Order[]> {
-    const data = await this.database
-      .selectFrom('orders')
-      .where('userid', '=', userId)
-      .selectAll()
-      .execute();
+    if (query.side) {
+      qb = qb.where('side', '=', query.side);
+    }
 
-    return data.map((item) => this.mapDbToDomain(item));
+    if (query.status) {
+      qb = qb.where('status', '=', query.status);
+    }
+
+    return qb;
   }
 
   private mapDbToDomain(data: Record<string, unknown>) {

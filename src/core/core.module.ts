@@ -3,7 +3,7 @@ import { DatabaseModule } from 'src/database/database.module';
 import { MarketApplicationService } from './application/services/market.service';
 import { UserController } from './api/users.controller';
 import { MarketController } from './api/market.controller';
-import { UserApplicationService } from './application/services/user.service';
+import { PortfolioApplicationService } from './application/services/portfolio.service';
 import { UserRepositoryImpl } from './infrastructure/user.repository';
 import { USER_REPOSITORY } from './domain/repositories/user.repository';
 import { InstrumentRepositoryImpl } from './infrastructure/instrument.repository';
@@ -12,7 +12,7 @@ import { MarketdataRepositoryImpl } from './infrastructure/marketdata.repository
 import { MARKETDATA_REPOSITORY } from './domain/repositories/marketdata.repository';
 import { OrderRepositoryImpl } from './infrastructure/order.repository';
 import { ORDER_REPOSITORY } from './domain/repositories/order.repository';
-import { FiatCalculatorService } from './domain/services/fiat-calculator.service';
+import { FiatCalculatorService } from './domain/services/cash-calculator.service';
 import { PositionCalculatorService } from './domain/services/position-calculator.service';
 
 @Module({
@@ -20,7 +20,7 @@ import { PositionCalculatorService } from './domain/services/position-calculator
   controllers: [UserController, MarketController],
   providers: [
     MarketApplicationService,
-    UserApplicationService,
+    PortfolioApplicationService,
     FiatCalculatorService,
     PositionCalculatorService,
     FiatCalculatorService,

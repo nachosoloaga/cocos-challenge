@@ -1,38 +1,41 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { UserApplicationService } from '../application/services/user.service';
+import { PortfolioApplicationService } from '../application/services/portfolio.service';
 import { PositionDto } from './dtos/position.dto';
+import { Position } from '../domain/models/position';
 
 @Controller('users')
 export class UserController {
   constructor(
-    private readonly userApplicationService: UserApplicationService,
+    private readonly portfolioApplicationService: PortfolioApplicationService,
   ) {}
 
-  @Get(':id/portfolio')
-  async getPortfolio(@Param('id') id: number): Promise<{
-    positions: { instrumentId: number; position: PositionDto }[];
-    totalFiatValue: number;
+  @Get(':userId/portfolio')
+  async getPortfolio(@Param('userId') userId: number): Promise<{
+    positions: PositionDto[];
+    totalCashAmount: number;
     totalAccountValue: number;
   }> {
-    const { positionsMap, totalFiatValue, totalAccountValue } =
-      await this.userApplicationService.getPortfolio(id);
+    const { positionsMap, totalCashAmount, totalAccountValue } =
+      await this.portfolioApplicationService.getPortfolio(userId);
 
-    const positions: { instrumentId: number; position: PositionDto }[] = [];
+    return {
+      positions: this.mapPositionsToDto(positionsMap),
+      totalCashAmount,
+      totalAccountValue,
+    };
+  }
+
+  mapPositionsToDto(positionsMap: Map<number, Position>): PositionDto[] {
+    const positions: PositionDto[] = [];
     for (const [instrumentId, position] of positionsMap) {
       positions.push({
         instrumentId,
-        position: {
-          currentTotalValue: position.currentTotalValue,
-          totalReturnPercentage: position.totalReturnPercentage,
-          quantity: position.quantity,
-        },
+        currentTotalValue: position.currentTotalValue,
+        totalReturnPercentage: position.totalReturnPercentage,
+        quantity: position.quantity,
       });
     }
 
-    return {
-      positions,
-      totalFiatValue,
-      totalAccountValue,
-    };
+    return positions;
   }
 }

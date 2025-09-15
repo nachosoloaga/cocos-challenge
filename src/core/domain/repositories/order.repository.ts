@@ -1,11 +1,8 @@
 import { Order } from '../models/order';
+import { OrderQueryObject } from '../queries/order.query-object';
 
 export interface OrderRepository {
-  findAll(): Promise<Order[]>;
-
-  findById(orderId: Order['id']): Promise<Order | null>;
-
-  findByUserId(userId: Order['userId']): Promise<Order[]>;
+  find(query: OrderQueryObject): Promise<Order[]>;
 }
 
 export const ORDER_REPOSITORY = 'ORDER_REPOSITORY';

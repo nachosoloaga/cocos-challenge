@@ -1,9 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InstrumentRepository } from '../domain/repositories/instrument.repository';
 import { DATABASE_CONNECTION } from 'src/database/database.provider';
-import { Kysely } from 'kysely';
+import { Kysely, SelectQueryBuilder } from 'kysely';
 import { DB } from 'src/database/database-types';
 import { Instrument } from '../domain/models/instrument';
+import { InstrumentQueryObject } from '../domain/queries/instrument.query-object';
 
 @Injectable()
 export class InstrumentRepositoryImpl implements InstrumentRepository {
@@ -11,44 +12,28 @@ export class InstrumentRepositoryImpl implements InstrumentRepository {
     @Inject(DATABASE_CONNECTION) private readonly database: Kysely<DB>,
   ) {}
 
-  async findAll(): Promise<Instrument[]> {
-    const data = await this.database
-      .selectFrom('instruments')
-      .selectAll()
-      .execute();
+  async find(query: InstrumentQueryObject): Promise<Instrument[]> {
+    const qb = this.buildQuery(query);
+
+    const data = await qb.selectAll().execute();
 
     return data.map((item) => this.mapDbToDomain(item));
   }
 
-  async findById(instrumentId: Instrument['id']): Promise<Instrument | null> {
-    const data = await this.database
-      .selectFrom('instruments')
-      .where('id', '=', parseInt(instrumentId))
-      .selectAll()
-      .executeTakeFirst();
+  private buildQuery(
+    query: InstrumentQueryObject,
+  ): SelectQueryBuilder<DB, 'instruments', unknown> {
+    let qb = this.database.selectFrom('instruments');
 
-    if (!data) {
-      return null;
+    if (query.ticker) {
+      qb = qb.where('ticker', 'ilike', query.ticker);
     }
 
-    return this.mapDbToDomain(data);
-  }
+    if (query.name) {
+      qb = qb.where('name', 'ilike', query.name);
+    }
 
-  async searchByTickerOrName(query: string): Promise<Instrument[]> {
-    const searchTerm = `%${query.toLowerCase()}%`;
-
-    const data = await this.database
-      .selectFrom('instruments')
-      .where((eb) =>
-        eb.or([
-          eb('ticker', 'ilike', searchTerm),
-          eb('name', 'ilike', searchTerm),
-        ]),
-      )
-      .selectAll()
-      .execute();
-
-    return data.map((item) => this.mapDbToDomain(item));
+    return qb;
   }
 
   private mapDbToDomain(data: Record<string, unknown>) {

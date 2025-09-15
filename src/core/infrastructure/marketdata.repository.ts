@@ -1,9 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { MarketdataRepository } from '../domain/repositories/marketdata.repository';
 import { DATABASE_CONNECTION } from 'src/database/database.provider';
-import { Kysely } from 'kysely';
+import { Kysely, SelectQueryBuilder } from 'kysely';
 import { DB } from 'src/database/database-types';
 import { Marketdata } from '../domain/models/marketdata';
+import { MarketdataQueryObject } from '../domain/queries/marketdata.query-object';
 
 @Injectable()
 export class MarketdataRepositoryImpl implements MarketdataRepository {
@@ -11,27 +12,40 @@ export class MarketdataRepositoryImpl implements MarketdataRepository {
     @Inject(DATABASE_CONNECTION) private readonly database: Kysely<DB>,
   ) {}
 
-  async findAll(): Promise<Marketdata[]> {
-    const data = await this.database
-      .selectFrom('marketdata')
-      .selectAll()
-      .execute();
+  async find(query: MarketdataQueryObject): Promise<Marketdata[]> {
+    const qb = this.buildQuery(query);
+
+    const data = await qb.selectAll().execute();
 
     return data.map((item) => this.mapDbToDomain(item));
   }
 
-  async findById(marketdataId: Marketdata['id']): Promise<Marketdata | null> {
-    const data = await this.database
-      .selectFrom('marketdata')
-      .where('id', '=', marketdataId)
-      .selectAll()
-      .executeTakeFirst();
+  async findOne(query: MarketdataQueryObject): Promise<Marketdata | null> {
+    const qb = this.buildQuery(query);
 
-    if (!data) {
-      return null;
+    const data = await qb.selectAll().executeTakeFirst();
+
+    return data ? this.mapDbToDomain(data) : null;
+  }
+
+  private buildQuery(
+    query: MarketdataQueryObject,
+  ): SelectQueryBuilder<DB, 'orders', unknown> {
+    let qb = this.database.selectFrom('orders');
+
+    if (query.datetime) {
+      qb = qb.where('datetime', '=', query.datetime);
     }
 
-    return this.mapDbToDomain(data);
+    if (query.instrumentId) {
+      qb = qb.where('instrumentid', '=', query.instrumentId);
+    }
+
+    if (query.sort) {
+      qb = qb.orderBy(query.sort.field, query.sort.type);
+    }
+
+    return qb;
   }
 
   private mapDbToDomain(data: Record<string, unknown>) {

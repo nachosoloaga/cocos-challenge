@@ -77,11 +77,7 @@ export class Order {
     return this._datetime;
   }
 
-  public isFilled(): boolean {
-    return this._status === 'FILLED';
-  }
-
-  public isFiat(): boolean {
+  public isCash(): boolean {
     return this._side === Side.CASH_IN || this._side === Side.CASH_OUT;
   }
 

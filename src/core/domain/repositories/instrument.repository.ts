@@ -1,11 +1,8 @@
 import { Instrument } from '../models/instrument';
+import { InstrumentQueryObject } from '../queries/instrument.query-object';
 
 export interface InstrumentRepository {
-  findById(instrumentId: Instrument['id']): Promise<Instrument | null>;
-
-  findAll(): Promise<Instrument[]>;
-
-  searchByTickerOrName(query: string): Promise<Instrument[]>;
+  find(query: InstrumentQueryObject): Promise<Instrument[]>;
 }
 
 export const INSTRUMENT_REPOSITORY = 'INSTRUMENT_REPOSITORY';

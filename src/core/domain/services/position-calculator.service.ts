@@ -4,6 +4,7 @@ import { MarketdataRepository } from '../repositories/marketdata.repository';
 import { MARKETDATA_REPOSITORY } from '../repositories/marketdata.repository';
 import { Side } from '../types/enums';
 import { Position } from '../models/position';
+import { MarketdataQueryObject } from '../queries/marketdata.query-object';
 
 export class PositionCalculatorService {
   constructor(
@@ -38,25 +39,24 @@ export class PositionCalculatorService {
       }
 
       if (currentPosition.quantity > 0) {
-        currentPosition.averagePrice =
-          currentPosition.totalCost / currentPosition.quantity;
         positionsMap.set(instrumentId, currentPosition);
       } else {
         positionsMap.delete(instrumentId);
       }
     }
 
-    return this.enhanceWithMarketdata(positionsMap);
+    return this.addMarketData(positionsMap);
   }
 
-  async enhanceWithMarketdata(
+  async addMarketData(
     positions: Map<number, Partial<Position>>,
   ): Promise<Map<number, Position>> {
-    const enhancedPositions = new Map<number, Position>();
+    const positionsWithMarketdata = new Map<number, Position>();
 
     for (const [key, position] of positions) {
-      // TODO: sort by date to get latest report
-      const marketdata = await this.marketdataRepository.findById(key);
+      const marketdata = await this.marketdataRepository.findOne(
+        MarketdataQueryObject.latestMarketdataForInstrument(key),
+      );
 
       if (!marketdata) {
         continue;
@@ -70,7 +70,7 @@ export class PositionCalculatorService {
           ? Math.round((totalReturn / position.totalCost!) * 100 * 100) / 100
           : 0;
 
-      enhancedPositions.set(key, {
+      positionsWithMarketdata.set(key, {
         quantity: position.quantity!,
         totalCost: position.totalCost!,
         averagePrice: position.averagePrice!,
@@ -80,6 +80,6 @@ export class PositionCalculatorService {
       });
     }
 
-    return enhancedPositions;
+    return positionsWithMarketdata;
   }
 }
