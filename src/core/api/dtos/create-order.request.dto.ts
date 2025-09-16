@@ -1,5 +1,5 @@
 import { IsEnum, IsNumber, IsPositive, ValidateIf } from 'class-validator';
-import { OrderType, Side } from 'src/core/domain/types/enums';
+import { OrderType, Side } from '../../domain/types/enums';
 
 export class CreateOrderRequestDto {
   @IsNumber()

@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { OrderRepository } from '../domain/repositories/order.repository';
-import { DATABASE_CONNECTION } from 'src/database/database.provider';
+import { DATABASE_CONNECTION } from '../../database/database.provider';
 import { Kysely, SelectQueryBuilder } from 'kysely';
-import { DB } from 'src/database/database-types';
+import { DB } from '../../database/database-types';
 import { Order } from '../domain/models/order';
 import { Side } from '../domain/types/enums';
 import { OrderQueryObject } from '../domain/queries/order.query-object';

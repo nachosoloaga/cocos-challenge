@@ -1,9 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { InstrumentRepository } from 'src/core/domain/repositories/instrument.repository';
-import { INSTRUMENT_REPOSITORY } from 'src/core/domain/repositories/instrument.repository';
-import { Instrument } from 'src/core/domain/models/instrument';
-import { AssetSearchDto } from 'src/core/api/dtos/asset-search.request.dto';
-import { InstrumentQueryObject } from 'src/core/domain/queries/instrument.query-object';
+import { InstrumentRepository } from '../../domain/repositories/instrument.repository';
+import { INSTRUMENT_REPOSITORY } from '../../domain/repositories/instrument.repository';
+import { Instrument } from '../../domain/models/instrument';
+import { AssetSearchDto } from '../../api/dtos/asset-search.request.dto';
+import { InstrumentQueryObject } from '../../domain/queries/instrument.query-object';
 
 @Injectable()
 export class MarketApplicationService {

@@ -1,4 +1,4 @@
-import { CreateOrderRequestDto } from 'src/core/api/dtos/create-order.request.dto';
+import { CreateOrderRequestDto } from '../../api/dtos/create-order.request.dto';
 import { OrderStatus, OrderType, Side } from '../types/enums';
 
 export class Order {

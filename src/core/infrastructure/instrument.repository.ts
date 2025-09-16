@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InstrumentRepository } from '../domain/repositories/instrument.repository';
-import { DATABASE_CONNECTION } from 'src/database/database.provider';
+import { DATABASE_CONNECTION } from '../../database/database.provider';
 import { Kysely, SelectQueryBuilder } from 'kysely';
-import { DB } from 'src/database/database-types';
+import { DB } from '../../database/database-types';
 import { Instrument } from '../domain/models/instrument';
 import { InstrumentQueryObject } from '../domain/queries/instrument.query-object';
 

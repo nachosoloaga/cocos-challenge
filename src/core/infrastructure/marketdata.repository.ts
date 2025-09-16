@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { MarketdataRepository } from '../domain/repositories/marketdata.repository';
-import { DATABASE_CONNECTION } from 'src/database/database.provider';
+import { DATABASE_CONNECTION } from '../../database/database.provider';
 import { Kysely, SelectQueryBuilder } from 'kysely';
-import { DB } from 'src/database/database-types';
+import { DB } from '../../database/database-types';
 import { Marketdata } from '../domain/models/marketdata';
 import { MarketdataQueryObject } from '../domain/queries/marketdata.query-object';
 
