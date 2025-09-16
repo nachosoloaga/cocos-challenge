@@ -4,7 +4,7 @@ import { USER_REPOSITORY } from 'src/core/domain/repositories/user.repository';
 import { OrderRepository } from 'src/core/domain/repositories/order.repository';
 import { ORDER_REPOSITORY } from 'src/core/domain/repositories/order.repository';
 import { CashCalculatorService } from 'src/core/domain/services/cash-calculator.service';
-import { StockPositionService } from 'src/core/domain/services/position-calculator.service';
+import { StockPositionService } from 'src/core/domain/services/stock-position.service';
 import { Order } from 'src/core/domain/models/order';
 import { StockPosition } from 'src/core/domain/models/position';
 import { OrderQueryObject } from 'src/core/domain/queries/order.query-object';

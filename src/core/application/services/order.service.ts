@@ -1,10 +1,5 @@
-import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { CreateOrderDto } from 'src/core/api/dtos/create-order.request.dto';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { CreateOrderRequestDto } from 'src/core/api/dtos/create-order.request.dto';
 import { Order } from 'src/core/domain/models/order';
 import { InstrumentQueryObject } from 'src/core/domain/queries/instrument.query-object';
 import {
@@ -18,8 +13,7 @@ import {
 import { MARKETDATA_REPOSITORY } from 'src/core/domain/repositories/marketdata.repository';
 import { MarketdataRepository } from 'src/core/domain/repositories/marketdata.repository';
 import { MarketdataQueryObject } from 'src/core/domain/queries/marketdata.query-object';
-import { OrderStatus, OrderType, Side } from 'src/core/domain/types/enums';
-import { OrderQueryObject } from 'src/core/domain/queries/order.query-object';
+import { OrderManagementService } from 'src/core/domain/services/order-management.service';
 
 @Injectable()
 export class OrderApplicationService {
@@ -29,9 +23,10 @@ export class OrderApplicationService {
     private readonly instrumentRepository: InstrumentRepository,
     @Inject(MARKETDATA_REPOSITORY)
     private readonly marketdataRepository: MarketdataRepository,
+    private readonly orderService: OrderManagementService,
   ) {}
 
-  async createOrder(createOrderDto: CreateOrderDto): Promise<number> {
+  async createOrder(createOrderDto: CreateOrderRequestDto): Promise<number> {
     const instrument = await this.instrumentRepository.findOne(
       InstrumentQueryObject.findById(createOrderDto.instrumentId),
     );
@@ -51,12 +46,15 @@ export class OrderApplicationService {
     }
 
     const marketPrice = marketData.getClose();
-    const { size, price } = this.calculateOrderDetails(
-      createOrderDto,
+    const { size, price } = this.orderService.calculateOrderDetails({
+      orderType: createOrderDto.type,
+      orderPrice: createOrderDto.price,
+      orderSize: createOrderDto.size,
+      orderAmount: createOrderDto.amount,
       marketPrice,
-    );
+    });
 
-    await this.validateOrder(
+    await this.orderService.validateOrder(
       createOrderDto.userId,
       createOrderDto.instrumentId,
       createOrderDto.side,
@@ -64,122 +62,11 @@ export class OrderApplicationService {
       price,
     );
 
-    const status =
-      createOrderDto.type === OrderType.MARKET
-        ? OrderStatus.FILLED
-        : OrderStatus.NEW;
+    createOrderDto.size = size;
+    createOrderDto.price = price;
 
-    const order = new Order(
-      null,
-      createOrderDto.instrumentId,
-      createOrderDto.userId,
-      createOrderDto.side,
-      size,
-      price,
-      createOrderDto.type,
-      status,
-      new Date().toISOString(),
-    );
+    const order = Order.fromDto(createOrderDto);
 
     return this.orderRepository.save(order);
-  }
-
-  private calculateOrderDetails(
-    createOrderDto: CreateOrderDto,
-    marketPrice: number,
-  ): { size: number; price: number } {
-    let size: number = 0;
-    let price: number = 0;
-
-    if (createOrderDto.type === OrderType.MARKET) {
-      price = marketPrice;
-    } else {
-      price = createOrderDto.price;
-    }
-
-    if (createOrderDto.size) {
-      size = createOrderDto.size;
-    } else if (createOrderDto.amount) {
-      size = Math.floor(createOrderDto.amount / price);
-    }
-
-    return { size, price };
-  }
-
-  private async validateOrder(
-    userId: number,
-    instrumentId: number,
-    side: Side,
-    size: number,
-    price: number,
-  ): Promise<void> {
-    const filledOrders = await this.orderRepository.find(
-      OrderQueryObject.filledOrdersForUser(userId),
-    );
-
-    if (filledOrders.length === 0) {
-      throw new NotFoundException('No filled orders found for user');
-    }
-
-    if (side === Side.BUY) {
-      const cashPosition = this.calculateCashPosition(filledOrders);
-      const requiredAmount = size * price;
-
-      if (cashPosition < requiredAmount) {
-        throw new BadRequestException(
-          `Insufficient funds. Required: $${requiredAmount}, Available: $${cashPosition}`,
-        );
-      }
-    } else if (side === Side.SELL) {
-      const sharesPosition = this.calculateSharesPosition(
-        filledOrders,
-        instrumentId,
-      );
-
-      if (sharesPosition < size) {
-        throw new BadRequestException(
-          `Insufficient shares. Required: ${size}, Available: ${sharesPosition}`,
-        );
-      }
-    }
-  }
-
-  private calculateCashPosition(orders: Order[]): number {
-    let cashPosition = 0;
-
-    for (const order of orders) {
-      if (order.side === Side.CASH_IN) {
-        cashPosition += order.size;
-      } else if (order.side === Side.CASH_OUT) {
-        cashPosition -= order.size;
-      } else if (order.side === Side.BUY) {
-        cashPosition -= order.size * order.price;
-      } else if (order.side === Side.SELL) {
-        cashPosition += order.size * order.price;
-      }
-    }
-
-    return cashPosition;
-  }
-
-  private calculateSharesPosition(
-    orders: Order[],
-    instrumentId: number,
-  ): number {
-    let sharesPosition = 0;
-
-    const instrumentOrders = orders.filter(
-      (order) => order.instrumentId === instrumentId,
-    );
-
-    for (const order of instrumentOrders) {
-      if (order.side === Side.BUY) {
-        sharesPosition += order.size;
-      } else if (order.side === Side.SELL) {
-        sharesPosition -= order.size;
-      }
-    }
-
-    return sharesPosition;
   }
 }

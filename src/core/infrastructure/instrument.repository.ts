@@ -17,6 +17,8 @@ export class InstrumentRepositoryImpl implements InstrumentRepository {
 
     const data = await qb.selectAll().execute();
 
+    console.log(data);
+
     return data.map((item) => this.mapDbToDomain(item));
   }
 

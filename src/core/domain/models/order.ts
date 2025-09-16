@@ -1,4 +1,5 @@
-import { Side } from '../types/enums';
+import { CreateOrderRequestDto } from 'src/core/api/dtos/create-order.request.dto';
+import { OrderStatus, OrderType, Side } from '../types/enums';
 
 export class Order {
   private _id: number | null;
@@ -135,6 +136,22 @@ export class Order {
       type,
       status,
       datetime.toISOString(),
+    );
+  }
+
+  static fromDto(dto: CreateOrderRequestDto): Order {
+    const status = OrderType.MARKET ? OrderStatus.FILLED : OrderStatus.NEW;
+
+    return new Order(
+      null,
+      dto.instrumentId,
+      dto.userId,
+      dto.side,
+      dto.size,
+      dto.price,
+      dto.type,
+      status,
+      new Date().toISOString(),
     );
   }
 }
