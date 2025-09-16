@@ -15,16 +15,19 @@ import { ORDER_REPOSITORY } from './domain/repositories/order.repository';
 import { CashCalculatorService } from './domain/services/cash-calculator.service';
 import { StockPositionService } from './domain/services/stock-position.service';
 import { OrderManagementService } from './domain/services/order-management.service';
+import { OrdersController } from './api/orders.controller';
+import { OrderApplicationService } from './application/services/order.service';
 
 @Module({
   imports: [DatabaseModule],
-  controllers: [UserController, MarketController],
+  controllers: [UserController, MarketController, OrdersController],
   providers: [
     MarketApplicationService,
     PortfolioApplicationService,
     CashCalculatorService,
     StockPositionService,
     OrderManagementService,
+    OrderApplicationService,
     {
       provide: USER_REPOSITORY,
       useClass: UserRepositoryImpl,

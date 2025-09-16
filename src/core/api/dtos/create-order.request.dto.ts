@@ -1,4 +1,4 @@
-import { IsEnum, IsNumber, IsPositive } from 'class-validator';
+import { IsEnum, IsNumber, IsPositive, ValidateIf } from 'class-validator';
 import { OrderType, Side } from 'src/core/domain/types/enums';
 
 export class CreateOrderRequestDto {
@@ -16,13 +16,16 @@ export class CreateOrderRequestDto {
 
   @IsNumber()
   @IsPositive()
+  @ValidateIf((o: CreateOrderRequestDto) => !o.amount)
   size: number;
 
   @IsNumber()
   @IsPositive()
+  @ValidateIf((o: CreateOrderRequestDto) => o.type === OrderType.LIMIT)
   price: number;
 
   @IsNumber()
   @IsPositive()
+  @ValidateIf((o: CreateOrderRequestDto) => !o.size)
   amount: number;
 }

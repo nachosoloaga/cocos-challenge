@@ -55,11 +55,13 @@ export class OrderManagementService {
       OrderQueryObject.filledOrdersForUser(userId),
     );
 
-    if (filledOrders.length === 0) {
-      throw new NotFoundException('No filled orders found for user');
-    }
-
     if (side === Side.BUY) {
+      const filledCashOrders = filledOrders.filter((order) => order.isCash());
+
+      if (filledCashOrders.length === 0) {
+        throw new NotFoundException('No funds available');
+      }
+
       const cashPosition = this.calculateCashPosition(filledOrders);
       const requiredAmount = size * price;
 

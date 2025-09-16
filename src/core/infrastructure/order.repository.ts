@@ -50,14 +50,14 @@ export class OrderRepositoryImpl implements OrderRepository {
     const result = await this.database
       .insertInto('orders')
       .values(dbOrder)
-      .executeTakeFirstOrThrow();
+      .returning('id')
+      .execute();
 
-    return Number(result.insertId);
+    return result[0].id;
   }
 
   private mapDomainToDb(order: Order): Record<string, unknown> {
     return {
-      id: order.id,
       instrumentid: order.instrumentId,
       userid: order.userId,
       side: order.side,
