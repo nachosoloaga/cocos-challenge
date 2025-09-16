@@ -1,9 +1,8 @@
 import { Kysely, PostgresDialect } from 'kysely';
 import { Pool } from 'pg';
-import { ConfigService } from '@nestjs/config';
 import { DB } from './database-types';
 
-export const createDatabase = (configService: ConfigService): Kysely<DB> => {
+export const createDatabase = (): Kysely<DB> => {
   return new Kysely<DB>({
     dialect: new PostgresDialect({
       pool: new Pool({
@@ -12,7 +11,6 @@ export const createDatabase = (configService: ConfigService): Kysely<DB> => {
         database: process.env.DB_NAME,
         user: process.env.DB_USERNAME,
         password: process.env.DB_PASSWORD,
-        ssl: true,
       }),
     }),
   });

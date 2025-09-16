@@ -36,11 +36,13 @@ export class InstrumentRepositoryImpl implements InstrumentRepository {
     let qb = this.database.selectFrom('instruments');
 
     if (query.ticker) {
-      qb = qb.where('ticker', 'ilike', query.ticker);
+      const tickerUpperCase = query.ticker.toUpperCase();
+      qb = qb.where('ticker', '=', tickerUpperCase);
     }
 
     if (query.name) {
-      qb = qb.where('name', 'ilike', query.name);
+      const nameUpperCase = query.name.toUpperCase();
+      qb = qb.where('name', '=', nameUpperCase);
     }
 
     return qb;

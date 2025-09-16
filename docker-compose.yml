@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - '3000:3000'
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=cocos_challenge
+      - DB_USERNAME=cocos_user
+      - DB_PASSWORD=cocos_password
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./migrations:/app/migrations
+    command: >
+      sh -c "
+        echo 'Running migrations...' &&
+        node migrations/run-migrations.js &&
+        echo 'Starting application...' &&
+        yarn start:dev
+      "
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=cocos_challenge
+      - POSTGRES_USER=cocos_user
+      - POSTGRES_PASSWORD=cocos_password
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U cocos_user -d cocos_challenge']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
