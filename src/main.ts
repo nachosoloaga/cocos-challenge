@@ -4,7 +4,6 @@ import { ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
-// TODO: Add logs
 async function bootstrap() {
   // Application setup
   const app = await NestFactory.create(AppModule);

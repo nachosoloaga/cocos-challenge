@@ -11,9 +11,24 @@ export class MarketdataQueryObject {
   static latestMarketdataForInstrument(
     instrumentId: number,
   ): MarketdataQueryObject {
-    return new MarketdataQueryObject(instrumentId, undefined, {
-      type: 'desc',
-      field: 'date',
+    return MarketdataQueryObject.create({
+      instrumentId,
+      sort: { type: 'desc', field: 'date' },
     });
+  }
+
+  static create({
+    instrumentId,
+    date,
+    sort,
+  }: {
+    instrumentId?: number;
+    date?: Date;
+    sort?: {
+      type: 'desc' | 'asc';
+      field: 'instrumentid' | 'date';
+    };
+  }): MarketdataQueryObject {
+    return new MarketdataQueryObject(instrumentId, date, sort);
   }
 }

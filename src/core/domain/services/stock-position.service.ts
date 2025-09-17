@@ -1,4 +1,4 @@
-import { Inject } from '@nestjs/common';
+import { Inject, Logger } from '@nestjs/common';
 import { Order } from '../models/order';
 import { MarketdataRepository } from '../repositories/marketdata.repository';
 import { MARKETDATA_REPOSITORY } from '../repositories/marketdata.repository';
@@ -10,6 +10,7 @@ export class StockPositionService {
   constructor(
     @Inject(MARKETDATA_REPOSITORY)
     private readonly marketdataRepository: MarketdataRepository,
+    private readonly logger: Logger,
   ) {}
 
   async calculateStockPositions(orders: Order[]): Promise<StockPosition[]> {
@@ -20,6 +21,8 @@ export class StockPositionService {
         totalCost: number;
       }
     >();
+
+    this.logger.log(`Calculating stock positions for ${orders.length} orders`);
 
     for (const order of orders) {
       const instrumentId = order.instrumentId;
@@ -51,12 +54,15 @@ export class StockPositionService {
   ): Promise<StockPosition[]> {
     const positionsWithMarketdata: StockPosition[] = [];
 
+    this.logger.log(`Adding marketdata for ${positions.size} positions`);
+
     for (const [key, position] of positions) {
       const marketdata = await this.marketdataRepository.findOne(
         MarketdataQueryObject.latestMarketdataForInstrument(key),
       );
 
       if (!marketdata) {
+        this.logger.warn(`Marketdata not found for instrument ${key}`);
         continue;
       }
 

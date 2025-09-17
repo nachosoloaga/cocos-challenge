@@ -8,7 +8,21 @@ export class OrderQueryObject {
     public readonly status?: string,
   ) {}
 
-  static filledOrdersForUser(userId: number): OrderQueryObject {
-    return new OrderQueryObject(userId, undefined, undefined, 'FILLED');
+  static filledOrders(userId: number): OrderQueryObject {
+    return OrderQueryObject.create({ userId, status: 'FILLED' });
+  }
+
+  static create({
+    userId,
+    instrumentId,
+    side,
+    status,
+  }: {
+    userId?: number;
+    instrumentId?: number;
+    side?: Side;
+    status?: string;
+  }): OrderQueryObject {
+    return new OrderQueryObject(userId, instrumentId, side, status);
   }
 }

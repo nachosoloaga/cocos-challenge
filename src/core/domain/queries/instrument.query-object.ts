@@ -9,11 +9,22 @@ export class InstrumentQueryObject {
     ticker: string,
     name: string,
   ): InstrumentQueryObject {
-    return new InstrumentQueryObject(ticker, name);
+    return InstrumentQueryObject.create({ ticker, name });
   }
 
   static findById(id: number): InstrumentQueryObject {
-    // TODO: Improve this
-    return new InstrumentQueryObject(undefined, undefined, id);
+    return InstrumentQueryObject.create({ id });
+  }
+
+  static create({
+    ticker,
+    name,
+    id,
+  }: {
+    ticker?: string;
+    name?: string;
+    id?: number;
+  }): InstrumentQueryObject {
+    return new InstrumentQueryObject(ticker, name, id);
   }
 }

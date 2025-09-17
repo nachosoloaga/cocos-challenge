@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { UserRepository } from '../../domain/repositories/user.repository';
 import { USER_REPOSITORY } from '../../domain/repositories/user.repository';
 import { OrderRepository } from '../../domain/repositories/order.repository';
@@ -16,18 +16,23 @@ export class PortfolioApplicationService {
     @Inject(ORDER_REPOSITORY) private readonly orderRepository: OrderRepository,
     private readonly cashCalculatorService: CashCalculatorService,
     private readonly stockPositionService: StockPositionService,
+    private readonly logger: Logger,
   ) {}
 
   async getPortfolio(userId: number) {
     const user = await this.userRepository.getUser(userId);
 
     if (!user) {
+      this.logger.error(`User not found for id ${userId}`);
+
       throw new NotFoundException('User not found');
     }
 
     const filledOrders = await this.orderRepository.find(
-      OrderQueryObject.filledOrdersForUser(user.id),
+      OrderQueryObject.filledOrders(user.id),
     );
+    this.logger.log(`Found ${filledOrders.length} filled orders`);
+
     const totalCash = this.calculateCashAmount(filledOrders);
     const { stockPositions, totalCurrentValueFromPositions } =
       await this.calculateStockPositions(filledOrders);
@@ -42,6 +47,8 @@ export class PortfolioApplicationService {
   private calculateCashAmount(orders: Order[]): number {
     const cashOrders = orders.filter((order) => order.isCash());
 
+    this.logger.log(`Found ${cashOrders.length} cash orders`);
+
     return this.cashCalculatorService.calculateCashAmount(cashOrders);
   }
 
@@ -50,6 +57,8 @@ export class PortfolioApplicationService {
     totalCurrentValueFromPositions: number;
   }> {
     const stockOrders = orders.filter((order) => order.isStock());
+
+    this.logger.log(`Found ${stockOrders.length} stock orders`);
 
     const stockPositions =
       await this.stockPositionService.calculateStockPositions(stockOrders);

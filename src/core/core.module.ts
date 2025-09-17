@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { DatabaseModule } from '../database/database.module';
 import { MarketApplicationService } from './application/services/market.service';
 import { UserController } from './api/users.controller';
@@ -28,6 +28,10 @@ import { OrderApplicationService } from './application/services/order.service';
     StockPositionService,
     OrderManagementService,
     OrderApplicationService,
+    {
+      provide: Logger,
+      useValue: new Logger(),
+    },
     {
       provide: USER_REPOSITORY,
       useClass: UserRepositoryImpl,

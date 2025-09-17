@@ -52,7 +52,7 @@ export class OrderManagementService {
     price: number,
   ): Promise<void> {
     const filledOrders = await this.orderRepository.find(
-      OrderQueryObject.filledOrdersForUser(userId),
+      OrderQueryObject.filledOrders(userId),
     );
 
     if (side === Side.BUY) {

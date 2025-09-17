@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { CreateOrderRequestDto } from '../../api/dtos/create-order.request.dto';
 import { Order } from '../../domain/models/order';
 import { InstrumentQueryObject } from '../../domain/queries/instrument.query-object';
@@ -24,6 +24,7 @@ export class OrderApplicationService {
     @Inject(MARKETDATA_REPOSITORY)
     private readonly marketdataRepository: MarketdataRepository,
     private readonly orderService: OrderManagementService,
+    private readonly logger: Logger,
   ) {}
 
   async createOrder(createOrderDto: CreateOrderRequestDto): Promise<number> {
@@ -31,6 +32,9 @@ export class OrderApplicationService {
       InstrumentQueryObject.findById(createOrderDto.instrumentId),
     );
     if (!instrument) {
+      this.logger.error(
+        `Instrument not found for id ${createOrderDto.instrumentId}`,
+      );
       throw new NotFoundException('Instrument not found');
     }
 
@@ -40,6 +44,9 @@ export class OrderApplicationService {
       ),
     );
     if (!marketData) {
+      this.logger.error(
+        `Market data not found for instrument ${createOrderDto.instrumentId}`,
+      );
       throw new NotFoundException(
         'Market data not available for this instrument',
       );
@@ -54,6 +61,8 @@ export class OrderApplicationService {
       marketPrice,
     });
 
+    this.logger.log(`Validating order for user ${createOrderDto.userId}`);
+
     await this.orderService.validateOrder(
       createOrderDto.userId,
       createOrderDto.instrumentId,
@@ -66,6 +75,8 @@ export class OrderApplicationService {
     createOrderDto.price = price;
 
     const order = Order.fromDto(createOrderDto);
+
+    this.logger.log(`Saving order ${order.id}`);
 
     return this.orderRepository.save(order);
   }
