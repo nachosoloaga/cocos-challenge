@@ -2,7 +2,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { InstrumentRepository } from '../../domain/repositories/instrument.repository';
 import { INSTRUMENT_REPOSITORY } from '../../domain/repositories/instrument.repository';
 import { Instrument } from '../../domain/models/instrument';
-import { AssetSearchDto } from '../../api/dtos/asset-search.request.dto';
+import { InstrumentSearchDto } from '../../api/dtos/instrument-search.request.dto';
 import { InstrumentQueryObject } from '../../domain/queries/instrument.query-object';
 
 @Injectable()
@@ -13,7 +13,7 @@ export class MarketApplicationService {
     private readonly logger: Logger,
   ) {}
 
-  async searchAssets(query: AssetSearchDto): Promise<Instrument[]> {
+  async searchInstruments(query: InstrumentSearchDto): Promise<Instrument[]> {
     if (!query.ticker && !query.name) {
       this.logger.warn('No ticker or name provided');
 
@@ -21,7 +21,7 @@ export class MarketApplicationService {
     }
 
     this.logger.log(
-      `Searching for assets with ticker ${query.ticker} and name ${query.name}`,
+      `Searching for instruments with ticker ${query.ticker} and name ${query.name}`,
     );
 
     const instruments = await this.instrumentRepository.find(

@@ -1,7 +1,7 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { MarketApplicationService } from '../application/services/market.service';
 import { InstrumentDto } from './dtos/instrument.response.dto';
-import { AssetSearchDto } from './dtos/asset-search.request.dto';
+import { InstrumentSearchDto } from './dtos/instrument-search.request.dto';
 import { Instrument } from '../domain/models/instrument';
 import { ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 
@@ -13,17 +13,19 @@ export class MarketController {
 
   @ApiResponse({
     status: 200,
-    description: 'Empty array if no assets found',
+    description: 'Empty array if no instruments found',
     type: [InstrumentDto],
   })
   @ApiOperation({
-    summary: 'Search for assets',
-    description: 'Search for assets by ticker or name',
+    summary: 'Search for instruments',
+    description: 'Search for instruments by ticker or name',
   })
-  @ApiQuery({ type: AssetSearchDto })
-  @Get('assets/search')
-  async searchAssets(@Query() query: AssetSearchDto): Promise<InstrumentDto[]> {
-    const res = await this.marketApplicationService.searchAssets(query);
+  @ApiQuery({ type: InstrumentSearchDto })
+  @Get('instruments/search')
+  async searchInstruments(
+    @Query() query: InstrumentSearchDto,
+  ): Promise<InstrumentDto[]> {
+    const res = await this.marketApplicationService.searchInstruments(query);
 
     return res.map((instrument) => this.mapToDto(instrument));
   }
