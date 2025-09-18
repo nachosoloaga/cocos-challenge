@@ -6,11 +6,13 @@
 
 - [1. Setup del proyecto](#setup-del-proyecto)
 - [2. Tests](#tests)
-- [3. Arquitectura de la aplicación](#arquitectura-de-la-aplicación)
-- [4. Conceptos clave](#conceptos-clave)
-- [5. Decisiones de diseño](#decisiones-de-diseño)
+- [3. Postman](#postman)
+- [4. Arquitectura de la aplicación](#arquitectura-de-la-aplicación)
+- [5. Conceptos clave](#conceptos-clave)
+- [6. Decisiones de diseño](#decisiones-de-diseño)
+- [7. Cuestiones a considerar](#cuestiones-a-considerar)
 
-## Setup del proyecto 💻
+## Setup del proyecto
 
 Crear un archivo `.env` en la carpeta root del proyecto con las siguientes variables (se puede utilizar el archivo `.env.example` como referencia):
 
@@ -54,7 +56,7 @@ yarn start:dev
 
 ----------
 
-### Tests 🧪
+## Tests
 
 Para correr los **tests unitarios**, ejecutar el siguiente comando en la terminal:
 
@@ -69,8 +71,13 @@ yarn test:integration
 ```
 
 ----------
+## Postman
 
-### Arquitectura de la aplicación 🏛️
+Se dispone de una colección de Postman con los endpoints disponibles en la aplicación. Para utilizarla, importar el archivo `Cocos_Challenge_API.postman_collection.json` desde Postman y asegurarse que la variable `{{baseUrl}}` tenga el valor correcto, por default: `http://localhost:3000`.
+
+----------
+
+## Arquitectura de la aplicación
 
 La aplicación está construida con NestJS (Node.js/TypeScript) y utiliza PostgreSQL como base de datos con Kysely como query builder.
 
@@ -108,7 +115,7 @@ Implementaciones concretas de repositorios y comunicación con servicios externo
 
 -----------
 
-### Conceptos clave 🔑
+## Conceptos clave
 
 - **Inversión de dependencias**: Las capas superiores dependen de abstracciones, no de implementaciones, implementada utilizando utilizando dependency injection.
 - **Inyección de dependencias**: Uso de tokens para desacoplar interfaces de implementaciones
@@ -121,7 +128,7 @@ Esta arquitectura permite un código mantenible, testeable y escalable, siguiend
 
 -----------
 
-### Decisiones de diseño ℹ️
+## Decisiones de diseño
 
 Si bien algunas decisiones pueden parecer un overkill para el tamaño del proyecto, decidí utilizar los enfoques y patrones que creo son útiles en una aplicación productiva de mediano/gran tamaño. Algunas de ellas fueron:
 
@@ -132,10 +139,11 @@ Si bien algunas decisiones pueden parecer un overkill para el tamaño del proyec
 
 ------------
 
-### Cuestiones a considerar ⚠️
+## Cuestiones a considerar
 
 - Se debe agregar **autenticación y autorización de usuarios**. En este momento se permite la consulta del portfolio y la creación de órdenes para cualquier usuario.
 - En este proyecto **no se simula la ejecución de la orden en el mercado per-se**, y tampoco se establece un mecanismo de comunicación para marcar órdenes LIMIT como REJECTED o FILLED de forma asíncrona. La implementación de este mecanismo seguramente esté atada al proveedor, pero algunas alternativas pueden ser:
     - Exponer un webhook `/order/filled` y `/order/rejected`
     - Escuchar eventos del tipo `ORDER_FILLED` o `ORDER_REJECTED`
     - Utilizar el protocolo FIX
+- Las operaciones deben ser idempotentes y deberían manejarse de forma correcta potenciales ordenes duplicadas, por ejemplo haciendo uso de una idempotency key.
