@@ -22,7 +22,7 @@ import { MarketdataQueryObject } from '../../domain/queries/marketdata.query-obj
 import { OrderManagementService } from '../../domain/services/order-management.service';
 import { CancelOrderRequestDto } from '../../api/dtos/cancel-order.request.dto';
 import { OrderQueryObject } from '../../domain/queries/order.query-object';
-import { OrderStatus } from '../../domain/types/enums';
+import { OrderStatus, OrderType } from '../../domain/types/enums';
 
 @Injectable()
 export class OrderApplicationService {
@@ -70,24 +70,42 @@ export class OrderApplicationService {
       marketPrice,
     });
 
+    const orderDto = { ...createOrderDto, size, price };
+
     this.logger.log(`Validating order for user ${createOrderDto.userId}`);
 
-    await this.orderService.validateOrder(
-      createOrderDto.userId,
-      createOrderDto.instrumentId,
-      createOrderDto.side,
-      size,
-      price,
-    );
+    try {
+      await this.orderService.validateOrder(
+        orderDto.userId,
+        orderDto.instrumentId,
+        orderDto.side,
+        size,
+        price,
+      );
 
-    createOrderDto.size = size;
-    createOrderDto.price = price;
+      const orderStatus =
+        orderDto.type === OrderType.MARKET
+          ? OrderStatus.FILLED
+          : OrderStatus.NEW;
+      const order = Order.fromDto({ ...orderDto, orderStatus });
 
-    const order = Order.fromDto(createOrderDto);
+      this.logger.log(`Saving order ${order.id}`);
 
-    this.logger.log(`Saving order ${order.id}`);
+      return this.orderRepository.save(order);
+    } catch (error) {
+      this.logger.error(
+        `Error creating order for user ${orderDto.userId}: ${error}`,
+      );
 
-    return this.orderRepository.save(order);
+      const order = Order.fromDto({
+        ...orderDto,
+        orderStatus: OrderStatus.REJECTED,
+      });
+
+      await this.orderRepository.save(order);
+
+      throw error;
+    }
   }
 
   async cancelOrder(cancelOrderDto: CancelOrderRequestDto): Promise<number> {

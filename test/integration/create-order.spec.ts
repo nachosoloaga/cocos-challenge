@@ -217,6 +217,18 @@ describe('OrdersController (Integration)', () => {
 
       const errorBody = response.body as ErrorResponse;
       expect(errorBody.message).toContain('Insufficient funds');
+
+      // Verify that a REJECTED order was created in the database
+      const rejectedOrders = await db
+        .selectFrom('orders')
+        .selectAll()
+        .where('userid', '=', testScenario.userId)
+        .where('instrumentid', '=', testScenario.instrumentId)
+        .where('status', '=', 'REJECTED')
+        .execute();
+
+      expect(rejectedOrders).toHaveLength(1);
+      expect(rejectedOrders[0].size).toBe(1000);
     });
 
     it('should return 400 when user has insufficient shares for sell order', async () => {
@@ -236,6 +248,18 @@ describe('OrdersController (Integration)', () => {
 
       const errorBody = response.body as ErrorResponse;
       expect(errorBody.message).toContain('Insufficient shares');
+
+      // Verify that a REJECTED order was created in the database
+      const rejectedOrders = await db
+        .selectFrom('orders')
+        .selectAll()
+        .where('userid', '=', testScenario.userId)
+        .where('instrumentid', '=', testScenario.instrumentId)
+        .where('status', '=', 'REJECTED')
+        .execute();
+
+      expect(rejectedOrders).toHaveLength(1);
+      expect(rejectedOrders[0].size).toBe(200);
     });
 
     it('should return 400 when user has no funds available', async () => {
@@ -262,6 +286,17 @@ describe('OrdersController (Integration)', () => {
       expect(errorBody.message).toBe(
         `Insufficient funds. Required: $100500, Available: $10000`,
       );
+
+      // Verify that a REJECTED order was created in the database
+      const rejectedOrders = await db
+        .selectFrom('orders')
+        .selectAll()
+        .where('userid', '=', testScenario.userId)
+        .where('instrumentid', '=', testScenario.instrumentId)
+        .where('status', '=', 'REJECTED')
+        .execute();
+
+      expect(rejectedOrders).toHaveLength(1);
     });
   });
 });

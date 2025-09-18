@@ -13,11 +13,11 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test:unit": "jest --config ./test/jest-unit.json",
+    "test:unit": "NODE_ENV=local jest --config ./test/jest-unit.json",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:integration": "jest --config ./test/jest-integration.json --testPathPattern=integration",
+    "test:integration": "NODE_ENV=local jest --config ./test/jest-integration.json --testPathPattern=integration",
     "kysely:generate": "kysely-codegen --out-file ./src/database/database-types.ts",
     "db:migrate": "node migrations/run-migrations.js"
   },
