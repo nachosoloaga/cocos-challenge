@@ -12,7 +12,7 @@ export class InstrumentQueryObject {
     return InstrumentQueryObject.create({ ticker, name });
   }
 
-  static findById(id: number): InstrumentQueryObject {
+  static byId(id: number): InstrumentQueryObject {
     return InstrumentQueryObject.create({ id });
   }
 

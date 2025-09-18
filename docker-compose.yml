@@ -5,7 +5,6 @@ services:
     build: .
     ports:
       - '3000:3000'
-    // TODO: Add environment variables
     environment:
       - NODE_ENV=development
       - DB_HOST=postgres
@@ -28,7 +27,6 @@ services:
 
   postgres:
     image: postgres:15-alpine
-    // TODO: Add environment variables
     environment:
       - POSTGRES_DB=cocos_challenge
       - POSTGRES_USER=cocos_user

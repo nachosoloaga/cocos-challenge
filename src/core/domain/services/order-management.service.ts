@@ -67,7 +67,10 @@ export class OrderManagementService {
 
       const cashPosition =
         this.cashPositionService.calculateCashPosition(filledOrders);
+
+      console.log(cashPosition);
       const requiredAmount = size * price;
+      console.log(requiredAmount);
 
       if (cashPosition < requiredAmount) {
         throw new BadRequestException(

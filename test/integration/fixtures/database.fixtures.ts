@@ -1,5 +1,10 @@
 import { Kysely } from 'kysely';
 import { DB } from '../../../src/database/database-types';
+import { faker } from '@faker-js/faker';
+
+// These fixtures assume the initial schema migration has been run:
+
+const CASH_INSTRUMENT_ID = 66;
 
 export class DatabaseFixtures {
   constructor(private readonly db: Kysely<DB>) {}
@@ -11,27 +16,15 @@ export class DatabaseFixtures {
     userId: number,
     cashAmount: number,
   ): Promise<void> {
-    // First create a cash instrument (ARS currency)
-    await this.db
-      .insertInto('instruments')
-      .values({
-        id: 0,
-        ticker: 'ARS',
-        name: 'PESOS',
-        type: 'MONEDA',
-      })
-      .onConflict((oc) => oc.column('id').doNothing())
-      .execute();
-
     // Create a cash-in order to establish cash position
     await this.db
       .insertInto('orders')
       .values({
         userid: userId,
-        instrumentid: 0, // Cash orders use instrument ID 0
+        instrumentid: CASH_INSTRUMENT_ID,
         side: 'CASH_IN',
         size: cashAmount,
-        price: 1.0,
+        price: 1,
         type: 'MARKET',
         status: 'FILLED',
         datetime: new Date().toISOString(),
@@ -43,20 +36,21 @@ export class DatabaseFixtures {
    * Creates a test instrument
    */
   async createInstrument(
-    id: number,
     ticker: string,
     name: string,
-    type: string = 'STOCK',
-  ): Promise<void> {
-    await this.db
+    type: string = 'ACCIONES',
+  ): Promise<number> {
+    const res = await this.db
       .insertInto('instruments')
       .values({
-        id,
         ticker,
         name,
         type,
       })
+      .returning('id')
       .execute();
+
+    return res[0].id;
   }
 
   /**
@@ -110,6 +104,22 @@ export class DatabaseFixtures {
   }
 
   /**
+   * Creates a test user
+   */
+  async createUser(): Promise<number> {
+    const res = await this.db
+      .insertInto('users')
+      .values({
+        email: faker.internet.email(),
+        accountnumber: faker.string.numeric(6),
+      })
+      .returning('id')
+      .execute();
+
+    return res[0].id;
+  }
+
+  /**
    * Sets up a complete test scenario with user, instrument, market data, and cash position
    */
   async setupCompleteTestScenario(): Promise<{
@@ -118,18 +128,19 @@ export class DatabaseFixtures {
     cashAmount: number;
     marketPrice: number;
   }> {
-    const userId = 1;
-    const instrumentId = 1;
-    const cashAmount = 10000; // $10,000
+    const cashAmount = 10000;
     const marketPrice = 100.5;
 
-    // Create instrument
-    await this.createInstrument(instrumentId, 'AAPL', 'Apple Inc.', 'STOCK');
+    const userId = await this.createUser();
 
-    // Create market data
+    const instrumentId = await this.createInstrument(
+      faker.string.alpha(4).toUpperCase(),
+      faker.company.name(),
+      'ACCIONES',
+    );
+
     await this.createMarketData(instrumentId, marketPrice);
 
-    // Create user with cash position
     await this.createUserWithCashPosition(userId, cashAmount);
 
     return {
@@ -150,12 +161,15 @@ export class DatabaseFixtures {
     marketPrice: number;
   }> {
     const userId = 1;
-    const instrumentId = 1;
     const sharesOwned = 100;
     const marketPrice = 100.5;
 
     // Create instrument
-    await this.createInstrument(instrumentId, 'AAPL', 'Apple Inc.', 'STOCK');
+    const instrumentId = await this.createInstrument(
+      'AAPL',
+      'Apple Inc.',
+      'ACCIONES',
+    );
 
     // Create market data
     await this.createMarketData(instrumentId, marketPrice);
@@ -177,14 +191,5 @@ export class DatabaseFixtures {
       sharesOwned,
       marketPrice,
     };
-  }
-
-  /**
-   * Cleans up all test data
-   */
-  async cleanup(): Promise<void> {
-    await this.db.deleteFrom('orders').execute();
-    await this.db.deleteFrom('marketdata').execute();
-    await this.db.deleteFrom('instruments').execute();
   }
 }

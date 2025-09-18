@@ -129,7 +129,8 @@ export class Order {
   }
 
   static fromDto(dto: CreateOrderRequestDto): Order {
-    const status = OrderType.MARKET ? OrderStatus.FILLED : OrderStatus.NEW;
+    const status =
+      dto.type === OrderType.MARKET ? OrderStatus.FILLED : OrderStatus.NEW;
 
     return new Order(
       null,

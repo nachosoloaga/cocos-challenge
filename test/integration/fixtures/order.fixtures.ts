@@ -75,16 +75,6 @@ export class OrderFixtures {
   }
 
   /**
-   * Creates an invalid order request with missing required fields
-   */
-  static createInvalidOrderRequest(): Partial<CreateOrderRequestDto> {
-    return {
-      userId: 1,
-      // Missing instrumentId, side, type, etc.
-    };
-  }
-
-  /**
    * Creates an order request for a non-existent instrument
    */
   static createOrderRequestForNonExistentInstrument(

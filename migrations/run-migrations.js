@@ -4,7 +4,7 @@ const path = require('path');
 
 // Database configuration
 const dbConfig = {
-  host: process.env.DB_HOST || 'postgres',
+  host: process.env.DB_HOST || 'localhost',
   port: parseInt(process.env.DB_PORT || '5432'),
   database: process.env.DB_NAME || 'cocos_challenge',
   user: process.env.DB_USERNAME || 'cocos_user',

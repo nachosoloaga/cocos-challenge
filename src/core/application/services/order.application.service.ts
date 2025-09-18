@@ -20,9 +20,9 @@ import { MARKETDATA_REPOSITORY } from '../../domain/repositories/marketdata.repo
 import { MarketdataRepository } from '../../domain/repositories/marketdata.repository';
 import { MarketdataQueryObject } from '../../domain/queries/marketdata.query-object';
 import { OrderManagementService } from '../../domain/services/order-management.service';
-import { CancelOrderRequestDto } from 'src/core/api/dtos/cancel-order.request.dto';
-import { OrderQueryObject } from 'src/core/domain/queries/order.query-object';
-import { OrderStatus } from 'src/core/domain/types/enums';
+import { CancelOrderRequestDto } from '../../api/dtos/cancel-order.request.dto';
+import { OrderQueryObject } from '../../domain/queries/order.query-object';
+import { OrderStatus } from '../../domain/types/enums';
 
 @Injectable()
 export class OrderApplicationService {
@@ -38,7 +38,7 @@ export class OrderApplicationService {
 
   async createOrder(createOrderDto: CreateOrderRequestDto): Promise<number> {
     const instrument = await this.instrumentRepository.findOne(
-      InstrumentQueryObject.findById(createOrderDto.instrumentId),
+      InstrumentQueryObject.byId(createOrderDto.instrumentId),
     );
     if (!instrument) {
       this.logger.error(

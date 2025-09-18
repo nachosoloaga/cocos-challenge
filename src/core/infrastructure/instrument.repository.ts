@@ -25,6 +25,8 @@ export class InstrumentRepositoryImpl implements InstrumentRepository {
   async findOne(query: InstrumentQueryObject): Promise<Instrument | null> {
     const qb = this.buildQuery(query);
 
+    console.log(qb.compile());
+
     const data = await qb.selectAll().executeTakeFirst();
 
     return data ? this.mapDbToDomain(data) : null;
@@ -34,6 +36,10 @@ export class InstrumentRepositoryImpl implements InstrumentRepository {
     query: InstrumentQueryObject,
   ): SelectQueryBuilder<DB, 'instruments', unknown> {
     let qb = this.database.selectFrom('instruments');
+
+    if (query.id) {
+      qb = qb.where('id', '=', query.id);
+    }
 
     if (query.ticker) {
       const tickerUpperCase = query.ticker.toUpperCase();

@@ -14,7 +14,7 @@ export class PortfolioApplicationService {
   constructor(
     @Inject(USER_REPOSITORY) private readonly userRepository: UserRepository,
     @Inject(ORDER_REPOSITORY) private readonly orderRepository: OrderRepository,
-    private readonly cashCalculatorService: CashPositionService,
+    private readonly cashPositionService: CashPositionService,
     private readonly stockPositionService: StockPositionService,
     private readonly logger: Logger,
   ) {}
@@ -33,7 +33,7 @@ export class PortfolioApplicationService {
     );
     this.logger.log(`Found ${filledOrders.length} filled orders`);
 
-    const totalCash = this.calculateCashAmount(filledOrders);
+    const totalCash = this.calculateCashPosition(filledOrders);
     const { stockPositions, totalCurrentValueFromPositions } =
       await this.calculateStockPositions(filledOrders);
 
@@ -44,12 +44,12 @@ export class PortfolioApplicationService {
     };
   }
 
-  private calculateCashAmount(orders: Order[]): number {
+  private calculateCashPosition(orders: Order[]): number {
     const cashOrders = orders.filter((order) => order.isCash());
 
     this.logger.log(`Found ${cashOrders.length} cash orders`);
 
-    return this.cashCalculatorService.calculateCashAmount(cashOrders);
+    return this.cashPositionService.calculateCashPosition(cashOrders);
   }
 
   private async calculateStockPositions(orders: Order[]): Promise<{

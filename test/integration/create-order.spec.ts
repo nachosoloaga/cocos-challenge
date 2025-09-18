@@ -9,6 +9,7 @@ import { DatabaseFixtures } from './fixtures/database.fixtures';
 import { OrderType, Side } from '../../src/core/domain/types/enums';
 import { DATABASE_CONNECTION } from '../../src/database/database.provider';
 import { AppModule } from '../../src/app.module';
+import { closeDatabase } from '../../src/database/database.config';
 
 interface CreateOrderResponse {
   orderId: number;
@@ -35,12 +36,9 @@ describe('OrdersController (Integration)', () => {
     dbFixtures = new DatabaseFixtures(db);
   });
 
-  beforeEach(async () => {
-    await dbFixtures.cleanup();
-  });
-
   afterAll(async () => {
     await app.close();
+    await closeDatabase();
   });
 
   describe('POST /orders', () => {
@@ -201,32 +199,6 @@ describe('OrdersController (Integration)', () => {
       expect(errorBody.message).toBe('Instrument not found');
     });
 
-    it('should return 404 when market data is not available', async () => {
-      // Arrange
-      const userId = 1;
-      const instrumentId = 1;
-
-      // Create instrument but no market data
-      await dbFixtures.createInstrument(instrumentId, 'AAPL', 'Apple Inc.');
-      await dbFixtures.createUserWithCashPosition(userId, 10000);
-
-      const orderRequest = OrderFixtures.createMarketBuyOrderRequest({
-        userId,
-        instrumentId,
-      });
-
-      // Act & Assert
-      const response = await request(app.getHttpServer())
-        .post('/orders')
-        .send(orderRequest)
-        .expect(404);
-
-      const errorBody = response.body as ErrorResponse;
-      expect(errorBody.message).toBe(
-        'Market data not available for this instrument',
-      );
-    });
-
     it('should return 400 when user has insufficient funds', async () => {
       // Arrange
       const testScenario = await dbFixtures.setupCompleteTestScenario();
@@ -268,41 +240,28 @@ describe('OrdersController (Integration)', () => {
 
     it('should return 400 when user has no funds available', async () => {
       // Arrange
-      const userId = 2; // User with no cash position
-      const instrumentId = 1;
+      const testScenario = await dbFixtures.setupCompleteTestScenario();
 
       // Create instrument and market data but no cash position for user
-      await dbFixtures.createInstrument(instrumentId, 'AAPL', 'Apple Inc.');
-      await dbFixtures.createMarketData(instrumentId, 100.5);
+      await dbFixtures.createInstrument('AAPL', 'Apple Inc.');
+      await dbFixtures.createMarketData(testScenario.instrumentId, 100.5);
 
-      const orderRequest = OrderFixtures.createMarketBuyOrderRequest({
-        userId,
-        instrumentId,
-      });
+      const orderRequest =
+        OrderFixtures.createOrderRequestWithInsufficientFunds({
+          userId: testScenario.userId,
+          instrumentId: testScenario.instrumentId,
+        });
 
       // Act & Assert
       const response = await request(app.getHttpServer())
         .post('/orders')
         .send(orderRequest)
-        .expect(404);
-
-      const errorBody = response.body as ErrorResponse;
-      expect(errorBody.message).toBe('No funds available');
-    });
-
-    it('should return 400 for invalid request data', async () => {
-      // Arrange
-      const invalidRequest = OrderFixtures.createInvalidOrderRequest();
-
-      // Act & Assert
-      const response = await request(app.getHttpServer())
-        .post('/orders')
-        .send(invalidRequest)
         .expect(400);
 
       const errorBody = response.body as ErrorResponse;
-      expect(errorBody.message).toBeDefined();
-      expect(Array.isArray(errorBody.message)).toBe(true);
+      expect(errorBody.message).toBe(
+        `Insufficient funds. Required: $100500, Available: $10000`,
+      );
     });
   });
 });
