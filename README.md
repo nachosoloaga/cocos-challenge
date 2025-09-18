@@ -1,6 +1,10 @@
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://cdn.prod.website-files.com/62e443aeb2cdfb6f2b0306a5/65cd2448467950674f70e3db_cocosLogos%20p%20caso%20de%20exito.png" width="250" alt="Nest Logo" /></a>
 </p>
+
+<p align="center">
+  Solución propuesta al challenge de backend de Cocos
+</p>
   
 ## Secciones 📘
 
@@ -84,30 +88,31 @@ La aplicación está construida con NestJS (Node.js/TypeScript) y utiliza Postgr
 ### Arquitectura por Capas (Layered Architecture)
 
 #### 1. API Layer
-/api/: Controladores REST que exponen endpoints
+REST controllers que exponen endpoints
 
-OrdersController: Gestión de órdenes (crear/cancelar)
-MarketController: Consulta de instrumentos y datos de mercado
-UsersController: Gestión de usuarios y sus portfolios
-DTOs: Objetos de transferencia de datos con validación usando class-validator
+- **OrdersController**: Gestión de órdenes (crear/cancelar)
+- **MarketController**: Consulta de instrumentos y datos de mercado
+- **UsersController**: Gestión de usuarios y sus portfolios
+- **DTOs**: Objetos de transferencia de datos con validación usando class-validator
 
 #### 2. Application Layer
-/application/services/: Actuan como orquestadores y puentes entre la API layer y la Domain layer
-OrderApplicationService: Coordina la creación y cancelación de órdenes
-MarketApplicationService: Maneja consultas de mercado
-PortfolioApplicationService: Gestiona portafolios de usuarios
+Application services que actuan como orquestadores y puentes entre la API layer y la Domain layer
+
+- **OrderApplicationService**: Coordina la creación y cancelación de órdenes
+- **MarketApplicationService**: Maneja consultas de mercado
+- **PortfolioApplicationService**: Gestiona portafolios de usuarios
 
 #### 3. Domain Layer
 
 Encapsula las reglas de negocio y los requerimientos funcionales de la aplicación.
 
-/domain/models/: Entidades de negocio (Order, User, Instrument, etc.)
-/domain/services/: Servicios de dominio con lógica específica
-OrderManagementService: Validación y cálculo de órdenes
-CashPositionService: Cálculo de posiciones de efectivo
-StockPositionService: Cálculo de posiciones de acciones
-/domain/repositories/: Interfaces para acceso a datos
-/domain/queries/: Objetos de consulta especializados
+- **/domain/models/**: Entidades de negocio (Order, User, Instrument, etc.)
+- **/domain/services/**: Servicios de dominio conteniendo la lógica de negocio
+- **OrderManagementService**: Validación y cálculo de órdenes
+- **CashPositionService**: Cálculo de posiciones de efectivo
+- **StockPositionService**: Cálculo de posiciones de acciones
+- **/domain/repositories/**: Interfaces para acceso a datos
+- **/domain/queries/**: Query objects
 
 #### 4. Infrastructure layer 
 
