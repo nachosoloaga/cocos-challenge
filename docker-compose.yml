@@ -6,12 +6,12 @@ services:
     ports:
       - '3000:3000'
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=${NODE_ENV}
       - DB_HOST=postgres
-      - DB_PORT=5432
-      - DB_NAME=cocos_challenge
-      - DB_USERNAME=cocos_user
-      - DB_PASSWORD=cocos_password
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_NAME}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
     depends_on:
       postgres:
         condition: service_healthy
@@ -28,9 +28,9 @@ services:
   postgres:
     image: postgres:15-alpine
     environment:
-      - POSTGRES_DB=cocos_challenge
-      - POSTGRES_USER=cocos_user
-      - POSTGRES_PASSWORD=cocos_password
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
     ports:
       - '5432:5432'
     volumes:
