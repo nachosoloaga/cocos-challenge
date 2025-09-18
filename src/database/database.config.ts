@@ -12,7 +12,7 @@ export const createDatabase = (): Kysely<DB> => {
       database: process.env.DB_NAME,
       user: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
-      ssl: process.env.ENV === 'local' ? false : true,
+      ssl: process.env.NODE_ENV === 'local' ? false : true,
     });
   }
 
