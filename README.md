@@ -29,6 +29,9 @@ DB_USERNAME=cocos_user
 DB_PASSWORD=cocos_password
 ```
 
+- Puede utilizarse el archivo `.env.example` como referencia.
+- Se diferencia `NODE_ENV=local` de `NODE_ENV=dev` para permitir conexión con BD local (sin SSL) y conexión con BD remota (con SSL) 
+
 ### Setup local (con Docker) 🐳
 #### Requisitos
 - Docker
