@@ -1,9 +1,8 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Param, HttpCode } from '@nestjs/common';
 import { OrderApplicationService } from '../application/services/order.application.service';
 import { CreateOrderRequestDto } from './dtos/create-order.request.dto';
 import { CreateOrderResponseDto } from './dtos/create-order.response.dto';
 import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { CancelOrderRequestDto } from './dtos/cancel-order.request.dto';
 import { CancelOrderResponseDto } from './dtos/cancel-order.response.dto';
 
 @Controller('orders')
@@ -55,13 +54,10 @@ export class OrdersController {
     status: 422,
     description: 'Order cannot be cancelled',
   })
-  @ApiBody({ type: CancelOrderRequestDto })
+  @HttpCode(200)
   @Post('/:id/cancel')
-  async cancelOrder(
-    @Body() cancelOrderDto: CancelOrderRequestDto,
-  ): Promise<CancelOrderResponseDto> {
-    const orderId =
-      await this.orderApplicationService.cancelOrder(cancelOrderDto);
+  async cancelOrder(@Param('id') id: number): Promise<CancelOrderResponseDto> {
+    const orderId = await this.orderApplicationService.cancelOrder(id);
 
     return {
       orderId,

@@ -20,7 +20,6 @@ import { MARKETDATA_REPOSITORY } from '../../domain/repositories/marketdata.repo
 import { MarketdataRepository } from '../../domain/repositories/marketdata.repository';
 import { MarketdataQueryObject } from '../../domain/queries/marketdata.query-object';
 import { OrderManagementService } from '../../domain/services/order-management.service';
-import { CancelOrderRequestDto } from '../../api/dtos/cancel-order.request.dto';
 import { OrderQueryObject } from '../../domain/queries/order.query-object';
 import { OrderStatus, OrderType } from '../../domain/types/enums';
 
@@ -87,9 +86,10 @@ export class OrderApplicationService {
         orderDto.type === OrderType.MARKET
           ? OrderStatus.FILLED
           : OrderStatus.NEW;
+
       const order = Order.fromDto({ ...orderDto, orderStatus });
 
-      this.logger.log(`Saving order ${order.id}`);
+      this.logger.log(`Saving order`);
 
       return this.orderRepository.save(order);
     } catch (error) {
@@ -108,10 +108,10 @@ export class OrderApplicationService {
     }
   }
 
-  async cancelOrder(cancelOrderDto: CancelOrderRequestDto): Promise<number> {
-    const order = await this.orderRepository.findOne(
-      OrderQueryObject.byId(cancelOrderDto.orderId),
-    );
+  async cancelOrder(id: number): Promise<number> {
+    const order = await this.orderRepository.findOne(OrderQueryObject.byId(id));
+
+    console.log(order);
 
     if (!order) {
       throw new NotFoundException('Order not found');

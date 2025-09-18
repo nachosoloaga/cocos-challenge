@@ -1,0 +1,337 @@
+{
+  "info": {
+    "name": "Cocos Challenge API",
+    "description": "Broker simulation API - Postman collection for testing all available endpoints",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Market",
+      "item": [
+        {
+          "name": "Search Instruments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/market/instruments/search",
+              "host": ["{{baseUrl}}"],
+              "path": ["market", "instruments", "search"],
+              "query": [
+                {
+                  "key": "ticker",
+                  "value": "AAPL",
+                  "description": "Ticker of the instrument (optional)"
+                }
+              ]
+            },
+            "description": "Search for instruments by ticker or name. Returns an array of instruments matching the search criteria."
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/market/instruments/search?ticker=AAPL",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["market", "instruments", "search"],
+                  "query": [
+                    {
+                      "key": "ticker",
+                      "value": "AAPL"
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "[\n  {\n    \"id\": \"1\",\n    \"ticker\": \"AAPL\",\n    \"name\": \"Apple Inc.\",\n    \"type\": \"stock\"\n  }\n]"
+            }
+          ]
+        }
+      ],
+      "description": "Market-related endpoints for searching instruments"
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Create Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1,\n  \"instrumentId\": 1,\n  \"side\": \"BUY\",\n  \"type\": \"LIMIT\",\n  \"size\": 10,\n  \"price\": 150.50\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/orders",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders"]
+            },
+            "description": "Create a new order (LIMIT or MARKET). Required fields: userId, instrumentId, side, type, and either size or amount. For LIMIT orders, price is required."
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": 1,\n  \"instrumentId\": 1,\n  \"side\": \"BUY\",\n  \"type\": \"LIMIT\",\n  \"size\": 10,\n  \"price\": 150.50\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/orders",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["orders"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"orderId\": 1\n}"
+            },
+            {
+              "name": "Market Order Example",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userId\": 1,\n  \"instrumentId\": 1,\n  \"side\": \"BUY\",\n  \"type\": \"MARKET\",\n  \"amount\": 1000\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/orders",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["orders"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"orderId\": 2\n}"
+            }
+          ]
+        },
+        {
+          "name": "Cancel Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/orders/:id/cancel",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders", ":id", "cancel"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "Order ID to cancel"
+                }
+              ]
+            },
+            "description": "Cancel a LIMIT order that is still in NEW status. Only NEW orders can be cancelled."
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"orderId\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/orders/1/cancel",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["orders", "1", "cancel"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"orderId\": 1\n}"
+            }
+          ]
+        }
+      ],
+      "description": "Order management endpoints for creating and cancelling orders"
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get Portfolio",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/:userId/portfolio",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", ":userId", "portfolio"],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": "1",
+                  "description": "User ID to get portfolio for"
+                }
+              ]
+            },
+            "description": "Get a user's portfolio with current stock positions, available cash, and total account value."
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/users/1/portfolio",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "1", "portfolio"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"stockPositions\": [\n    {\n      \"instrumentId\": 1,\n      \"quantity\": 100,\n      \"totalReturnPercentage\": 5.2,\n      \"currentTotalValue\": 15000\n    }\n  ],\n  \"totalCash\": 5000,\n  \"totalAccountValue\": 20000\n}"
+            }
+          ]
+        }
+      ],
+      "description": "User-related endpoints for portfolio management"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// You can add pre-request scripts here if needed"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// You can add test scripts here if needed"
+        ]
+      }
+    }
+  ]
+}

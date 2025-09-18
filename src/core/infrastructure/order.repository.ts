@@ -32,6 +32,10 @@ export class OrderRepositoryImpl implements OrderRepository {
   ): SelectQueryBuilder<DB, 'orders', unknown> {
     let qb = this.database.selectFrom('orders');
 
+    if (query.id) {
+      qb = qb.where('id', '=', query.id);
+    }
+
     if (query.userId) {
       qb = qb.where('userid', '=', query.userId);
     }
