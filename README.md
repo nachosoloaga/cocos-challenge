@@ -130,6 +130,7 @@ Implementaciones concretas de repositorios y comunicación con servicios externo
 - **Enfoque Domain-Driven Design**: Si bien no se distinguen bounded contexts específicos dado el tamaño del proyecto, se hace foco en encapsular y enriquecer la capa de dominio particularmente.
 - **Repository Pattern**: Abstrae el acceso a datos con interfaces
 - **Query Objects**: Encapsula lógica de consultas complejas
+- **Gestión de migraciones**: Se provee un mecanismo de migraciones versionado en la BD.
 
 Esta arquitectura permite un código mantenible, testeable y escalable, siguiendo principios SOLID y Clean Architecture.
 
