@@ -61,7 +61,7 @@ export class OrderApplicationService {
       );
     }
 
-    const marketPrice = marketData.getClose();
+    const marketPrice = marketData.close;
     const { size, price } = this.orderService.calculateOrderDetails({
       orderType: createOrderDto.type,
       orderPrice: createOrderDto.price,

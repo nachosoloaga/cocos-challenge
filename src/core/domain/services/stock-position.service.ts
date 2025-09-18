@@ -68,7 +68,7 @@ export class StockPositionService {
         continue;
       }
 
-      const currentPrice = marketdata.getClose();
+      const currentPrice = marketdata.close;
       const currentTotalValue = position.quantity! * currentPrice;
       const totalReturn = currentTotalValue - position.totalCost!;
       const totalReturnPercentage =

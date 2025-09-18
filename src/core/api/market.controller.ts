@@ -32,10 +32,10 @@ export class MarketController {
 
   private mapToDto(instrument: Instrument): InstrumentDto {
     return new InstrumentDto(
-      instrument.getId(),
-      instrument.getTicker(),
-      instrument.getName(),
-      instrument.getType(),
+      instrument.id,
+      instrument.ticker,
+      instrument.name,
+      instrument.type,
     );
   }
 }

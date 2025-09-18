@@ -1,20 +1,20 @@
 // - **marketdata**: id, instrumentId, high, low, open, close, previousClose, datetime
 export class Marketdata {
-  private id: number;
+  private _id: number;
 
-  private instrumentId: number;
+  private _instrumentId: number;
 
-  private high: number;
+  private _high: number;
 
-  private low: number;
+  private _low: number;
 
-  private open: number;
+  private _open: number;
 
-  private close: number;
+  private _close: number;
 
-  private previousClose: number;
+  private _previousClose: number;
 
-  private datetime: string;
+  private _datetime: string;
 
   constructor(
     id: number,
@@ -26,46 +26,46 @@ export class Marketdata {
     previousClose: number,
     datetime: string,
   ) {
-    this.id = id;
-    this.instrumentId = instrumentId;
-    this.high = high;
-    this.low = low;
-    this.open = open;
-    this.close = close;
-    this.previousClose = previousClose;
-    this.datetime = datetime;
+    this._id = id;
+    this._instrumentId = instrumentId;
+    this._high = high;
+    this._low = low;
+    this._open = open;
+    this._close = close;
+    this._previousClose = previousClose;
+    this._datetime = datetime;
   }
 
-  public getId(): number {
-    return this.id;
+  public get id(): number {
+    return this._id;
   }
 
-  public getInstrumentId(): number {
-    return this.instrumentId;
+  public get instrumentId(): number {
+    return this._instrumentId;
   }
 
-  public getHigh(): number {
-    return this.high;
+  public get high(): number {
+    return this._high;
   }
 
-  public getLow(): number {
-    return this.low;
+  public get low(): number {
+    return this._low;
   }
 
-  public getOpen(): number {
-    return this.open;
+  public get open(): number {
+    return this._open;
   }
 
-  public getClose(): number {
-    return this.close;
+  public get close(): number {
+    return this._close;
   }
 
-  public getPreviousClose(): number {
-    return this.previousClose;
+  public get previousClose(): number {
+    return this._previousClose;
   }
 
-  public getDatetime(): string {
-    return this.datetime;
+  public get datetime(): string {
+    return this._datetime;
   }
 
   static fromDb({
