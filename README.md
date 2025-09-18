@@ -1,98 +1,141 @@
 <p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
+  <a href="http://nestjs.com/" target="blank"><img src="https://cdn.prod.website-files.com/62e443aeb2cdfb6f2b0306a5/65cd2448467950674f70e3db_cocosLogos%20p%20caso%20de%20exito.png" width="250" alt="Nest Logo" /></a>
 </p>
+  
+## Secciones 📘
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+- [1. Setup del proyecto](#setup-del-proyecto)
+- [2. Tests](#tests)
+- [3. Arquitectura de la aplicación](#arquitectura-de-la-aplicación)
+- [4. Conceptos clave](#conceptos-clave)
+- [5. Decisiones de diseño](#decisiones-de-diseño)
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Setup del proyecto 💻
 
-## Description
+Crear un archivo `.env` en la carpeta root del proyecto con las siguientes variables (se puede utilizar el archivo `.env.example` como referencia):
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
-
-```bash
-$ yarn install
+```yaml
+NODE_ENV=local
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=cocos_challenge
+DB_USERNAME=cocos_user
+DB_PASSWORD=cocos_password
 ```
 
-## Compile and run the project
+### Setup local (con Docker) 🐳
+#### Requisitos
+- Docker
+- docker-compose
+
+El proyecto cuenta con un archivo `docker-compose.yml` que contiene lo necesario para correr la aplicación y la base de datos. Para levantar el proyecto utilizando Docker ejecutar los siguientes comandos en la terminal:
 
 ```bash
-# development
-$ yarn run start
-
-# watch mode
-$ yarn run start:dev
-
-# production mode
-$ yarn run start:prod
+docker-compose build
+docker-compose up
 ```
 
-## Run tests
+Las migraciones se ejecutan automáticamente al levantar el contenedor.
+
+### Setup local (sin Docker) 🏠
+#### Requisitos
+- Node 22+
+- Yarn/npm
+- Postgres 15
+
+Luego, ejecutar los siguientes comandos en la terminal:
 
 ```bash
-# unit tests
-$ yarn run test
+yarn install
+yarn db:migrate
 
-# e2e tests
-$ yarn run test:e2e
-
-# test coverage
-$ yarn run test:cov
+yarn start:dev
 ```
 
-## Deployment
+----------
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+### Tests 🧪
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Para correr los **tests unitarios**, ejecutar el siguiente comando en la terminal:
 
 ```bash
-$ yarn install -g @nestjs/mau
-$ mau deploy
+yarn test:unit
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+Para correr los **tests de integración**, asegurarse que la BD esté levantada de forma local o mediante Docker, y ejecutar el siguiente comando en la terminal:
 
-## Resources
+```bash
+yarn test:integration
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+----------
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### Arquitectura de la aplicación 🏛️
 
-## Support
+La aplicación está construida con NestJS (Node.js/TypeScript) y utiliza PostgreSQL como base de datos con Kysely como query builder.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### Arquitectura por Capas (Layered Architecture)
 
-## Stay in touch
+#### 1. API Layer
+/api/: Controladores REST que exponen endpoints
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+OrdersController: Gestión de órdenes (crear/cancelar)
+MarketController: Consulta de instrumentos y datos de mercado
+UsersController: Gestión de usuarios y sus portfolios
+DTOs: Objetos de transferencia de datos con validación usando class-validator
 
-## License
+#### 2. Application Layer
+/application/services/: Actuan como orquestadores y puentes entre la API layer y la Domain layer
+OrderApplicationService: Coordina la creación y cancelación de órdenes
+MarketApplicationService: Maneja consultas de mercado
+PortfolioApplicationService: Gestiona portafolios de usuarios
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+#### 3. Domain Layer
+
+Encapsula las reglas de negocio y los requerimientos funcionales de la aplicación.
+
+/domain/models/: Entidades de negocio (Order, User, Instrument, etc.)
+/domain/services/: Servicios de dominio con lógica específica
+OrderManagementService: Validación y cálculo de órdenes
+CashPositionService: Cálculo de posiciones de efectivo
+StockPositionService: Cálculo de posiciones de acciones
+/domain/repositories/: Interfaces para acceso a datos
+/domain/queries/: Objetos de consulta especializados
+
+#### 4. Infrastructure layer 
+
+Implementaciones concretas de repositorios y comunicación con servicios externos en caso de existir. 
+
+-----------
+
+### Conceptos clave 🔑
+
+- **Inversión de dependencias**: Las capas superiores dependen de abstracciones, no de implementaciones, implementada utilizando utilizando dependency injection.
+- **Inyección de dependencias**: Uso de tokens para desacoplar interfaces de implementaciones
+- **Separación de responsabilidades**: Cada capa tiene una responsabilidad específica
+- **Enfoque Domain-Driven Design**: Si bien no se distinguen bounded contexts específicos dado el tamaño del proyecto, se hace foco en encapsular y enriquecer la capa de dominio particularmente.
+- **Repository Pattern**: Abstrae el acceso a datos con interfaces
+- **Query Objects**: Encapsula lógica de consultas complejas
+
+Esta arquitectura permite un código mantenible, testeable y escalable, siguiendo principios SOLID y Clean Architecture.
+
+-----------
+
+### Decisiones de diseño ℹ️
+
+Si bien algunas decisiones pueden parecer un overkill para el tamaño del proyecto, decidí utilizar los enfoques y patrones que creo son útiles en una aplicación productiva de mediano/gran tamaño. Algunas de ellas fueron:
+
+- **Opté por utilizar Kysely en reemplazo de un ORM** para tener control total sobre el acceso a los datos y no depender de las queries generadas por un ORM. Las queries son definidas siguiendo el patrón QueryObject, que permite expresar las queries en lenguaje de dominio.
+- Opté por la arquitectura Layered Architecture porque creo que tiene muchas ventajas a nivel de organización y escalabilidad del proyecto ante la estructura `controllers > services > repositories`, sobre todo en etapas avanzadas de los proyectos
+- Dependency inversion: definir las interfaces y los contratos en la capa de dominio, y las implementaciones en la capa de infraestructura permite desacoplar el dominio de nuestra aplicación completamente de la capa de persistencia y/o de servicios externos.
+- DB: agregué índices únicamente sobre las columnas utilizadas en las queries definidas.
+
+------------
+
+### Cuestiones a considerar ⚠️
+
+- Se debe agregar **autenticación y autorización de usuarios**. En este momento se permite la consulta del portfolio y la creación de órdenes para cualquier usuario.
+- En este proyecto **no se simula la ejecución de la orden en el mercado per-se**, y tampoco se establece un mecanismo de comunicación para marcar órdenes LIMIT como REJECTED o FILLED de forma asíncrona. La implementación de este mecanismo seguramente esté atada al proveedor, pero algunas alternativas pueden ser:
+    - Exponer un webhook `/order/filled` y `/order/rejected`
+    - Escuchar eventos del tipo `ORDER_FILLED` o `ORDER_REJECTED`
+    - Utilizar el protocolo FIX
