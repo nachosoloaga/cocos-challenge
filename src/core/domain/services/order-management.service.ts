@@ -71,6 +71,7 @@ export class OrderManagementService {
       const requiredAmount = size * price;
 
       if (cashPosition < requiredAmount) {
+        // TODO: Persist the order in the database with status REJECTED
         throw new BadRequestException(
           `Insufficient funds. Required: $${requiredAmount}, Available: $${cashPosition}`,
         );
@@ -83,6 +84,7 @@ export class OrderManagementService {
         );
 
       if (sharesPosition < size) {
+        // TODO: Persist the order in the database with status REJECTED
         throw new BadRequestException(
           `Insufficient shares. Required: ${size}, Available: ${sharesPosition}`,
         );
