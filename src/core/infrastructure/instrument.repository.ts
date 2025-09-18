@@ -17,15 +17,11 @@ export class InstrumentRepositoryImpl implements InstrumentRepository {
 
     const data = await qb.selectAll().execute();
 
-    console.log(data);
-
     return data.map((item) => this.mapDbToDomain(item));
   }
 
   async findOne(query: InstrumentQueryObject): Promise<Instrument | null> {
     const qb = this.buildQuery(query);
-
-    console.log(qb.compile());
 
     const data = await qb.selectAll().executeTakeFirst();
 
