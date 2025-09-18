@@ -73,7 +73,10 @@ Para correr los **tests unitarios**, ejecutar el siguiente comando en la termina
 yarn test:unit
 ```
 
-Para correr los **tests de integración**, asegurarse que la BD esté levantada de forma local o mediante Docker, y ejecutar el siguiente comando en la terminal:
+Para correr los **tests de integración** ejecutar el siguiente comando en la terminal:
+
+⚠️ Es requisito que la BD esté levantada, puede levantarse rápidamente con el siguiente comando: `docker-compose up postgres -d`.
+⚠️⚠️ Para simplificar el setup, tal vez sea necesario correr las migraciones al menos una vez (`yarn db:migrate`) para asegurarse que la BD esté seedeada con entidades básicas como por ej. instrumento ARS. 
 
 ```bash
 yarn test:integration
