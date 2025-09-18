@@ -13,10 +13,5 @@
     "**/*.(t|j)s"
   ],
   "coverageDirectory": "../coverage",
-  "testTimeout": 30000,
-  "globals": {
-    "ts-jest": {
-      "tsconfig": "tsconfig.json"
-    }
-  }
+  "testTimeout": 30000
 }
