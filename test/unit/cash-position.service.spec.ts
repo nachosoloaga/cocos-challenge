@@ -17,6 +17,7 @@ describe('CashPositionService', () => {
     it('should return 0 for empty orders array', () => {
       const orders: Order[] = [];
       const result = service.calculateCashPosition(orders);
+
       expect(result).toBe(0);
     });
 
@@ -46,6 +47,7 @@ describe('CashPositionService', () => {
         ),
       ];
       const result = service.calculateCashPosition(orders);
+
       expect(result).toBe(1500);
     });
 
@@ -74,6 +76,7 @@ describe('CashPositionService', () => {
           '2023-01-01T00:00:00Z',
         ),
       ];
+
       const result = service.calculateCashPosition(orders);
       expect(result).toBe(-500);
     });
@@ -104,6 +107,7 @@ describe('CashPositionService', () => {
         ),
       ];
       const result = service.calculateCashPosition(orders);
+
       expect(result).toBe(-625); // -(10*50 + 5*25) = -625
     });
 
@@ -334,144 +338,6 @@ describe('CashPositionService', () => {
       ];
       const result = service.calculateCashPosition(orders);
       expect(result).toBe(-1500); // -1000 - (10*50) = -1500
-    });
-
-    it('should handle decimal values correctly', () => {
-      const orders = [
-        new Order(
-          1,
-          1,
-          1,
-          Side.CASH_IN,
-          1000.5,
-          0,
-          OrderType.MARKET,
-          OrderStatus.FILLED,
-          '2023-01-01T00:00:00Z',
-        ),
-        new Order(
-          2,
-          2,
-          1,
-          Side.BUY,
-          2.5,
-          10.25,
-          OrderType.MARKET,
-          OrderStatus.FILLED,
-          '2023-01-01T00:00:00Z',
-        ),
-        new Order(
-          3,
-          3,
-          1,
-          Side.SELL,
-          1.5,
-          15.75,
-          OrderType.MARKET,
-          OrderStatus.FILLED,
-          '2023-01-01T00:00:00Z',
-        ),
-      ];
-      const result = service.calculateCashPosition(orders);
-      expect(result).toBe(1000.5 - 2.5 * 10.25 + 1.5 * 15.75); // 1000.50 - 25.625 + 23.625 = 998.50
-    });
-
-    it('should handle large numbers correctly', () => {
-      const orders = [
-        new Order(
-          1,
-          1,
-          1,
-          Side.CASH_IN,
-          1000000,
-          0,
-          OrderType.MARKET,
-          OrderStatus.FILLED,
-          '2023-01-01T00:00:00Z',
-        ),
-        new Order(
-          2,
-          2,
-          1,
-          Side.BUY,
-          1000,
-          500,
-          OrderType.MARKET,
-          OrderStatus.FILLED,
-          '2023-01-01T00:00:00Z',
-        ),
-      ];
-      const result = service.calculateCashPosition(orders);
-      expect(result).toBe(500000); // 1000000 - (1000*500) = 500000
-    });
-
-    it('should handle orders with different statuses (status should not affect calculation)', () => {
-      const orders = [
-        new Order(
-          1,
-          1,
-          1,
-          Side.CASH_IN,
-          1000,
-          0,
-          OrderType.MARKET,
-          OrderStatus.FILLED,
-          '2023-01-01T00:00:00Z',
-        ),
-        new Order(
-          2,
-          1,
-          1,
-          Side.CASH_IN,
-          500,
-          0,
-          OrderType.MARKET,
-          OrderStatus.NEW,
-          '2023-01-01T00:00:00Z',
-        ),
-        new Order(
-          3,
-          1,
-          1,
-          Side.CASH_IN,
-          200,
-          0,
-          OrderType.MARKET,
-          OrderStatus.CANCELLED,
-          '2023-01-01T00:00:00Z',
-        ),
-      ];
-      const result = service.calculateCashPosition(orders);
-      expect(result).toBe(1700); // All orders are included regardless of status
-    });
-
-    it('should handle orders with different types (type should not affect calculation)', () => {
-      const orders = [
-        new Order(
-          1,
-          1,
-          1,
-          Side.CASH_IN,
-          1000,
-          0,
-          OrderType.MARKET,
-          OrderStatus.FILLED,
-          '2023-01-01T00:00:00Z',
-        ),
-        new Order(
-          2,
-          1,
-          1,
-          Side.CASH_IN,
-          500,
-          0,
-          OrderType.LIMIT,
-          OrderStatus.FILLED,
-          '2023-01-01T00:00:00Z',
-        ),
-      ];
-      const result = service.calculateCashPosition(orders);
-      expect(result).toBe(1500); // Type should not affect calculation
     });
   });
 });

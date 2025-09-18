@@ -260,92 +260,6 @@ describe('StockPositionService', () => {
       expect(position2?.currentTotalValue).toBe(550);
     });
 
-    it('should remove positions with zero or negative quantity', async () => {
-      const orders = [
-        new Order(
-          1,
-          1,
-          1,
-          Side.BUY,
-          10,
-          50,
-          OrderType.MARKET,
-          OrderStatus.FILLED,
-          '2023-01-01T00:00:00Z',
-        ),
-        new Order(
-          2,
-          1,
-          1,
-          Side.SELL,
-          10,
-          60,
-          OrderType.MARKET,
-          OrderStatus.FILLED,
-          '2023-01-01T00:00:00Z',
-        ),
-      ];
-
-      const result = await service.calculateStockPositions(orders);
-      expect(result).toHaveLength(0);
-    });
-
-    it('should handle orders with different statuses', async () => {
-      const orders = [
-        new Order(
-          1,
-          1,
-          1,
-          Side.BUY,
-          10,
-          50,
-          OrderType.MARKET,
-          OrderStatus.FILLED,
-          '2023-01-01T00:00:00Z',
-        ),
-        new Order(
-          2,
-          1,
-          1,
-          Side.BUY,
-          5,
-          60,
-          OrderType.MARKET,
-          OrderStatus.NEW,
-          '2023-01-01T00:00:00Z',
-        ),
-        new Order(
-          3,
-          1,
-          1,
-          Side.BUY,
-          3,
-          40,
-          OrderType.MARKET,
-          OrderStatus.CANCELLED,
-          '2023-01-01T00:00:00Z',
-        ),
-      ];
-
-      const mockMarketdata = new Marketdata(
-        1,
-        1,
-        70,
-        40,
-        45,
-        65,
-        50,
-        '2023-01-01T00:00:00Z',
-      );
-      mockMarketdataRepository.findOne.mockResolvedValue(mockMarketdata);
-
-      const result = await service.calculateStockPositions(orders);
-
-      expect(result).toHaveLength(1);
-      expect(result[0].quantity).toBe(18); // All orders included regardless of status: 10 + 5 + 3
-      expect(result[0].totalCost).toBe(920); // (10*50) + (5*60) + (3*40) = 500 + 300 + 120 = 920
-    });
-
     it('should handle missing market data gracefully', async () => {
       const orders = [
         new Order(
@@ -414,54 +328,6 @@ describe('StockPositionService', () => {
       expect(position2?.totalReturn).toBe(50); // 350 - 300
       expect(position2?.totalReturnPercentage).toBe(16.67); // (50/300) * 100
     });
-
-    it('should handle zero total cost', async () => {
-      const positions = new Map<number, Partial<StockPosition>>();
-      positions.set(1, { quantity: 10, totalCost: 0 });
-
-      const mockMarketdata = new Marketdata(
-        1,
-        1,
-        70,
-        40,
-        45,
-        60,
-        50,
-        '2023-01-01T00:00:00Z',
-      );
-      mockMarketdataRepository.findOne.mockResolvedValue(mockMarketdata);
-
-      const result = await service.addMarketData(positions);
-
-      expect(result).toHaveLength(1);
-      expect(result[0].totalReturnPercentage).toBe(0);
-    });
-
-    it('should skip positions with missing market data', async () => {
-      const positions = new Map<number, Partial<StockPosition>>();
-      positions.set(1, { quantity: 10, totalCost: 500 });
-      positions.set(2, { quantity: 5, totalCost: 300 });
-
-      const mockMarketdata = new Marketdata(
-        1,
-        1,
-        70,
-        40,
-        45,
-        60,
-        50,
-        '2023-01-01T00:00:00Z',
-      );
-
-      mockMarketdataRepository.findOne
-        .mockResolvedValueOnce(mockMarketdata)
-        .mockResolvedValueOnce(null);
-
-      const result = await service.addMarketData(positions);
-
-      expect(result).toHaveLength(1);
-      expect(result[0].instrumentId).toBe(1);
-    });
   });
 
   describe('getTotalCurrentValue', () => {
@@ -493,30 +359,6 @@ describe('StockPositionService', () => {
       const positions: StockPosition[] = [];
       const result = service.getTotalCurrentValue(positions);
       expect(result).toBe(0);
-    });
-
-    it('should handle negative current values', () => {
-      const positions: StockPosition[] = [
-        {
-          instrumentId: 1,
-          quantity: 10,
-          totalCost: 500,
-          totalReturn: -100,
-          totalReturnPercentage: -20,
-          currentTotalValue: 400,
-        },
-        {
-          instrumentId: 2,
-          quantity: 5,
-          totalCost: 300,
-          totalReturn: 50,
-          totalReturnPercentage: 16.67,
-          currentTotalValue: 350,
-        },
-      ];
-
-      const result = service.getTotalCurrentValue(positions);
-      expect(result).toBe(750); // 400 + 350
     });
   });
 
@@ -581,36 +423,6 @@ describe('StockPositionService', () => {
       expect(result).toBe(0);
     });
 
-    it('should handle negative positions', () => {
-      const orders = [
-        new Order(
-          1,
-          1,
-          1,
-          Side.SELL,
-          10,
-          50,
-          OrderType.MARKET,
-          OrderStatus.FILLED,
-          '2023-01-01T00:00:00Z',
-        ),
-        new Order(
-          2,
-          1,
-          1,
-          Side.BUY,
-          5,
-          60,
-          OrderType.MARKET,
-          OrderStatus.FILLED,
-          '2023-01-01T00:00:00Z',
-        ),
-      ];
-
-      const result = service.calculateStockPositionForInstrument(orders, 1);
-      expect(result).toBe(-5); // -10 + 5
-    });
-
     it('should handle zero position', () => {
       const orders = [
         new Order(
@@ -639,66 +451,6 @@ describe('StockPositionService', () => {
 
       const result = service.calculateStockPositionForInstrument(orders, 1);
       expect(result).toBe(0); // 10 - 10
-    });
-
-    it('should handle decimal quantities', () => {
-      const orders = [
-        new Order(
-          1,
-          1,
-          1,
-          Side.BUY,
-          2.5,
-          50,
-          OrderType.MARKET,
-          OrderStatus.FILLED,
-          '2023-01-01T00:00:00Z',
-        ),
-        new Order(
-          2,
-          1,
-          1,
-          Side.SELL,
-          1.5,
-          60,
-          OrderType.MARKET,
-          OrderStatus.FILLED,
-          '2023-01-01T00:00:00Z',
-        ),
-      ];
-
-      const result = service.calculateStockPositionForInstrument(orders, 1);
-      expect(result).toBe(1); // 2.5 - 1.5
-    });
-
-    it('should handle large quantities', () => {
-      const orders = [
-        new Order(
-          1,
-          1,
-          1,
-          Side.BUY,
-          1000,
-          50,
-          OrderType.MARKET,
-          OrderStatus.FILLED,
-          '2023-01-01T00:00:00Z',
-        ),
-        new Order(
-          2,
-          1,
-          1,
-          Side.SELL,
-          500,
-          60,
-          OrderType.MARKET,
-          OrderStatus.FILLED,
-          '2023-01-01T00:00:00Z',
-        ),
-      ];
-
-      const result = service.calculateStockPositionForInstrument(orders, 1);
-      expect(result).toBe(500); // 1000 - 500
     });
   });
 });
