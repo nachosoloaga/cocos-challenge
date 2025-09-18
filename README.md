@@ -34,6 +34,8 @@ DB_PASSWORD=cocos_password
 - Docker
 - docker-compose
 
+ℹ️ Por default el servidor se levanta en el puerto 3000.
+
 El proyecto cuenta con un archivo `docker-compose.yml` que contiene lo necesario para correr la aplicación y la base de datos. Para levantar el proyecto utilizando Docker ejecutar los siguientes comandos en la terminal:
 
 ```bash
