@@ -1,0 +1,22 @@
+{
+    "moduleFileExtensions": ["js", "json", "ts"],
+    "rootDir": "./unit",
+    "testEnvironment": "node",
+    "testRegex": ".*\\.spec\\.ts$",
+    "transform": {
+        "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "transformIgnorePatterns": [
+        "node_modules/(?!(@faker-js/faker)/)"
+    ],
+    "collectCoverageFrom": [
+        "**/*.(t|j)s"
+    ],
+    "coverageDirectory": "../coverage",
+    "testTimeout": 30000,
+    "globals": {
+        "ts-jest": {
+        "tsconfig": "tsconfig.json"
+        }
+    }
+}
