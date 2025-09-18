@@ -4,7 +4,7 @@ import { DATABASE_CONNECTION } from '../../database/database.provider';
 import { Kysely, SelectQueryBuilder } from 'kysely';
 import { DB } from '../../database/database-types';
 import { Order } from '../domain/models/order';
-import { Side } from '../domain/types/enums';
+import { OrderStatus, Side } from '../domain/types/enums';
 import { OrderQueryObject } from '../domain/queries/order.query-object';
 
 @Injectable()
@@ -18,6 +18,13 @@ export class OrderRepositoryImpl implements OrderRepository {
     const data = await qb.selectAll().execute();
 
     return data.map((item) => this.mapDbToDomain(item));
+  }
+
+  async findOne(query: OrderQueryObject): Promise<Order | null> {
+    const qb = this.buildQuery(query);
+    const data = await qb.selectAll().executeTakeFirst();
+
+    return data ? this.mapDbToDomain(data) : null;
   }
 
   private buildQuery(
@@ -56,6 +63,18 @@ export class OrderRepositoryImpl implements OrderRepository {
     return result[0].id;
   }
 
+  async update(order: Order): Promise<number> {
+    const dbOrder = this.mapDomainToDb(order);
+    const result = await this.database
+      .updateTable('orders')
+      .set(dbOrder)
+      .where('id', '=', order.id)
+      .returning('id')
+      .execute();
+
+    return result[0].id;
+  }
+
   private mapDomainToDb(order: Order): Record<string, unknown> {
     return {
       instrumentid: order.instrumentId,
@@ -78,7 +97,7 @@ export class OrderRepositoryImpl implements OrderRepository {
       size: data.size as number,
       price: data.price as number,
       type: data.type as string,
-      status: data.status as string,
+      status: data.status as OrderStatus,
       datetime: data.datetime as Date,
     });
   }

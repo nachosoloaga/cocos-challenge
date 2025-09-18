@@ -13,7 +13,9 @@ export class StockPositionService {
     private readonly logger: Logger,
   ) {}
 
-  async calculateStockPositions(orders: Order[]): Promise<StockPosition[]> {
+  public async calculateStockPositions(
+    orders: Order[],
+  ): Promise<StockPosition[]> {
     const positionsMap = new Map<
       number,
       {
@@ -49,7 +51,7 @@ export class StockPositionService {
     return this.addMarketData(positionsMap);
   }
 
-  async addMarketData(
+  public async addMarketData(
     positions: Map<number, Partial<StockPosition>>,
   ): Promise<StockPosition[]> {
     const positionsWithMarketdata: StockPosition[] = [];
@@ -92,5 +94,26 @@ export class StockPositionService {
       (acc, position) => acc + position.currentTotalValue,
       0,
     );
+  }
+
+  public calculateStockPositionForInstrument(
+    orders: Order[],
+    instrumentId: number,
+  ): number {
+    let sharesPosition = 0;
+
+    const instrumentOrders = orders.filter(
+      (order) => order.instrumentId === instrumentId,
+    );
+
+    for (const order of instrumentOrders) {
+      if (order.side === Side.BUY) {
+        sharesPosition += order.size;
+      } else if (order.side === Side.SELL) {
+        sharesPosition -= order.size;
+      }
+    }
+
+    return sharesPosition;
   }
 }

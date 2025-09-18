@@ -3,7 +3,7 @@ import { UserRepository } from '../../domain/repositories/user.repository';
 import { USER_REPOSITORY } from '../../domain/repositories/user.repository';
 import { OrderRepository } from '../../domain/repositories/order.repository';
 import { ORDER_REPOSITORY } from '../../domain/repositories/order.repository';
-import { CashCalculatorService } from '../../domain/services/cash-calculator.service';
+import { CashPositionService } from '../../domain/services/cash-position.service';
 import { StockPositionService } from '../../domain/services/stock-position.service';
 import { Order } from '../../domain/models/order';
 import { StockPosition } from '../../domain/models/position';
@@ -14,7 +14,7 @@ export class PortfolioApplicationService {
   constructor(
     @Inject(USER_REPOSITORY) private readonly userRepository: UserRepository,
     @Inject(ORDER_REPOSITORY) private readonly orderRepository: OrderRepository,
-    private readonly cashCalculatorService: CashCalculatorService,
+    private readonly cashCalculatorService: CashPositionService,
     private readonly stockPositionService: StockPositionService,
     private readonly logger: Logger,
   ) {}

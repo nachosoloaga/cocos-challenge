@@ -16,7 +16,7 @@ export class Order {
 
   private _type: string;
 
-  private _status: string;
+  private _status: OrderStatus;
 
   private _datetime: string;
 
@@ -28,7 +28,7 @@ export class Order {
     size: number,
     price: number,
     type: string,
-    status: string,
+    status: OrderStatus,
     datetime: string,
   ) {
     this._id = id;
@@ -70,12 +70,16 @@ export class Order {
     return this._type;
   }
 
-  public get status(): string {
+  public get status(): OrderStatus {
     return this._status;
   }
 
   public get datetime(): string {
     return this._datetime;
+  }
+
+  public set status(status: OrderStatus) {
+    this._status = status;
   }
 
   public isCash(): boolean {
@@ -86,23 +90,8 @@ export class Order {
     return this._side === Side.BUY || this._side === Side.SELL;
   }
 
-  public getCashAmount(): number {
-    if (this._side === Side.CASH_IN) {
-      return this._size * this._price;
-    } else if (this._side === Side.CASH_OUT) {
-      return -this._size * this._price;
-    }
-
-    // TODO: Do we need to handle this?
-    /*
-     } else if (order.side === Side.BUY) {
-        cashPosition -= order.size * order.price;
-      } else if (order.side === Side.SELL) {
-        cashPosition += order.size * order.price;
-      }
-    */
-
-    return 0;
+  public canBeCancelled(): boolean {
+    return this._status === OrderStatus.NEW;
   }
 
   static fromDb({
@@ -123,7 +112,7 @@ export class Order {
     size: number;
     price: number;
     type: string;
-    status: string;
+    status: OrderStatus;
     datetime: Date;
   }): Order {
     return new Order(

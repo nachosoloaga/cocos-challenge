@@ -6,11 +6,14 @@ import {
 } from '../repositories/order.repository';
 import { Inject, NotFoundException } from '@nestjs/common';
 import { BadRequestException } from '@nestjs/common';
-import { Order } from '../models/order';
+import { CashPositionService } from './cash-position.service';
+import { StockPositionService } from './stock-position.service';
 
 export class OrderManagementService {
   constructor(
     @Inject(ORDER_REPOSITORY) private readonly orderRepository: OrderRepository,
+    private readonly cashPositionService: CashPositionService,
+    private readonly stockPositionService: StockPositionService,
   ) {}
 
   public calculateOrderDetails({
@@ -62,7 +65,8 @@ export class OrderManagementService {
         throw new NotFoundException('No funds available');
       }
 
-      const cashPosition = this.calculateCashPosition(filledOrders);
+      const cashPosition =
+        this.cashPositionService.calculateCashPosition(filledOrders);
       const requiredAmount = size * price;
 
       if (cashPosition < requiredAmount) {
@@ -71,10 +75,11 @@ export class OrderManagementService {
         );
       }
     } else if (side === Side.SELL) {
-      const sharesPosition = this.calculateSharesPosition(
-        filledOrders,
-        instrumentId,
-      );
+      const sharesPosition =
+        this.stockPositionService.calculateStockPositionForInstrument(
+          filledOrders,
+          instrumentId,
+        );
 
       if (sharesPosition < size) {
         throw new BadRequestException(
@@ -82,44 +87,5 @@ export class OrderManagementService {
         );
       }
     }
-  }
-
-  private calculateCashPosition(orders: Order[]): number {
-    let cashPosition = 0;
-
-    for (const order of orders) {
-      if (order.side === Side.CASH_IN) {
-        cashPosition += order.size;
-      } else if (order.side === Side.CASH_OUT) {
-        cashPosition -= order.size;
-      } else if (order.side === Side.BUY) {
-        cashPosition -= order.size * order.price;
-      } else if (order.side === Side.SELL) {
-        cashPosition += order.size * order.price;
-      }
-    }
-
-    return cashPosition;
-  }
-
-  private calculateSharesPosition(
-    orders: Order[],
-    instrumentId: number,
-  ): number {
-    let sharesPosition = 0;
-
-    const instrumentOrders = orders.filter(
-      (order) => order.instrumentId === instrumentId,
-    );
-
-    for (const order of instrumentOrders) {
-      if (order.side === Side.BUY) {
-        sharesPosition += order.size;
-      } else if (order.side === Side.SELL) {
-        sharesPosition -= order.size;
-      }
-    }
-
-    return sharesPosition;
   }
 }

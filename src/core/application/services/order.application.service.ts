@@ -1,4 +1,10 @@
-import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  Logger,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { CreateOrderRequestDto } from '../../api/dtos/create-order.request.dto';
 import { Order } from '../../domain/models/order';
 import { InstrumentQueryObject } from '../../domain/queries/instrument.query-object';
@@ -14,6 +20,9 @@ import { MARKETDATA_REPOSITORY } from '../../domain/repositories/marketdata.repo
 import { MarketdataRepository } from '../../domain/repositories/marketdata.repository';
 import { MarketdataQueryObject } from '../../domain/queries/marketdata.query-object';
 import { OrderManagementService } from '../../domain/services/order-management.service';
+import { CancelOrderRequestDto } from 'src/core/api/dtos/cancel-order.request.dto';
+import { OrderQueryObject } from 'src/core/domain/queries/order.query-object';
+import { OrderStatus } from 'src/core/domain/types/enums';
 
 @Injectable()
 export class OrderApplicationService {
@@ -79,5 +88,23 @@ export class OrderApplicationService {
     this.logger.log(`Saving order ${order.id}`);
 
     return this.orderRepository.save(order);
+  }
+
+  async cancelOrder(cancelOrderDto: CancelOrderRequestDto): Promise<number> {
+    const order = await this.orderRepository.findOne(
+      OrderQueryObject.byId(cancelOrderDto.orderId),
+    );
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    if (!order.canBeCancelled()) {
+      throw new UnprocessableEntityException('Order cannot be cancelled');
+    }
+
+    order.status = OrderStatus.CANCELLED;
+
+    return this.orderRepository.update(order);
   }
 }

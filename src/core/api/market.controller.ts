@@ -1,5 +1,5 @@
 import { Controller, Get, Query } from '@nestjs/common';
-import { MarketApplicationService } from '../application/services/market.service';
+import { MarketApplicationService } from '../application/services/market.application.service';
 import { InstrumentDto } from './dtos/instrument.response.dto';
 import { InstrumentSearchDto } from './dtos/instrument-search.request.dto';
 import { Instrument } from '../domain/models/instrument';

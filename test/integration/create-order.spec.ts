@@ -31,13 +31,11 @@ describe('OrdersController (Integration)', () => {
     app = moduleFixture.createNestApplication();
     await app.init();
 
-    // Get database instance from the app
     db = app.get<Kysely<DB>>(DATABASE_CONNECTION);
     dbFixtures = new DatabaseFixtures(db);
   });
 
   beforeEach(async () => {
-    // Clean up before each test
     await dbFixtures.cleanup();
   });
 
@@ -46,269 +44,265 @@ describe('OrdersController (Integration)', () => {
   });
 
   describe('POST /orders', () => {
-    describe('Happy Path', () => {
-      it('should create a market buy order successfully', async () => {
-        // Arrange
-        const testScenario = await dbFixtures.setupCompleteTestScenario();
-        const orderRequest = OrderFixtures.createMarketBuyOrderRequest({
-          userId: testScenario.userId,
-          instrumentId: testScenario.instrumentId,
-          size: 10,
-        });
-
-        // Act
-        const response = await request(app.getHttpServer())
-          .post('/orders')
-          .send(orderRequest)
-          .expect(201);
-
-        // Assert
-        const responseBody = response.body as CreateOrderResponse;
-        expect(responseBody).toHaveProperty('orderId');
-        expect(typeof responseBody.orderId).toBe('number');
-        expect(responseBody.orderId).toBeGreaterThan(0);
-
-        // Verify the order was saved in the database
-        const savedOrder = await db
-          .selectFrom('orders')
-          .selectAll()
-          .where('id', '=', responseBody.orderId)
-          .executeTakeFirst();
-
-        expect(savedOrder).toBeDefined();
-        expect(savedOrder?.userid).toBe(testScenario.userId);
-        expect(savedOrder?.instrumentid).toBe(testScenario.instrumentId);
-        expect(savedOrder?.side).toBe(Side.BUY);
-        expect(savedOrder?.type).toBe(OrderType.MARKET);
-        expect(savedOrder?.size).toBe(10);
-        expect(parseFloat(savedOrder?.price as string)).toBe(
-          testScenario.marketPrice,
-        );
-        expect(savedOrder?.status).toBe('FILLED');
+    it('should create a market buy order successfully', async () => {
+      // Arrange
+      const testScenario = await dbFixtures.setupCompleteTestScenario();
+      const orderRequest = OrderFixtures.createMarketBuyOrderRequest({
+        userId: testScenario.userId,
+        instrumentId: testScenario.instrumentId,
+        size: 10,
       });
 
-      it('should create a limit buy order successfully', async () => {
-        // Arrange
-        const testScenario = await dbFixtures.setupCompleteTestScenario();
-        const orderRequest = OrderFixtures.createLimitBuyOrderRequest({
-          userId: testScenario.userId,
-          instrumentId: testScenario.instrumentId,
-          size: 5,
-          price: 95.0, // Below market price
-        });
+      // Act
+      const response = await request(app.getHttpServer())
+        .post('/orders')
+        .send(orderRequest)
+        .expect(201);
 
-        // Act
-        const response = await request(app.getHttpServer())
-          .post('/orders')
-          .send(orderRequest)
-          .expect(201);
+      // Assert
+      const responseBody = response.body as CreateOrderResponse;
+      expect(responseBody).toHaveProperty('orderId');
+      expect(typeof responseBody.orderId).toBe('number');
+      expect(responseBody.orderId).toBeGreaterThan(0);
 
-        // Assert
-        const responseBody = response.body as CreateOrderResponse;
-        expect(responseBody).toHaveProperty('orderId');
-        expect(typeof responseBody.orderId).toBe('number');
+      // Verify the order was saved in the database
+      const savedOrder = await db
+        .selectFrom('orders')
+        .selectAll()
+        .where('id', '=', responseBody.orderId)
+        .executeTakeFirst();
 
-        // Verify the order was saved with limit price
-        const savedOrder = await db
-          .selectFrom('orders')
-          .selectAll()
-          .where('id', '=', responseBody.orderId)
-          .executeTakeFirst();
-
-        expect(savedOrder).toBeDefined();
-        expect(parseFloat(savedOrder?.price as string)).toBe(95.0);
-        expect(savedOrder?.type).toBe(OrderType.LIMIT);
-        expect(savedOrder?.status).toBe('NEW'); // Limit orders start as NEW
-      });
-
-      it('should create a market sell order successfully when user has shares', async () => {
-        // Arrange
-        const testScenario = await dbFixtures.setupUserWithShares();
-        const orderRequest = OrderFixtures.createMarketSellOrderRequest({
-          userId: testScenario.userId,
-          instrumentId: testScenario.instrumentId,
-          size: 10,
-        });
-
-        // Act
-        const response = await request(app.getHttpServer())
-          .post('/orders')
-          .send(orderRequest)
-          .expect(201);
-
-        // Assert
-        const responseBody = response.body as CreateOrderResponse;
-        expect(responseBody).toHaveProperty('orderId');
-        expect(typeof responseBody.orderId).toBe('number');
-
-        // Verify the order was saved
-        const savedOrder = await db
-          .selectFrom('orders')
-          .selectAll()
-          .where('id', '=', responseBody.orderId)
-          .executeTakeFirst();
-
-        expect(savedOrder).toBeDefined();
-        expect(savedOrder?.side).toBe(Side.SELL);
-        expect(savedOrder?.size).toBe(10);
-        expect(parseFloat(savedOrder?.price as string)).toBe(
-          testScenario.marketPrice,
-        );
-      });
-
-      it('should create an order with amount instead of size', async () => {
-        // Arrange
-        const testScenario = await dbFixtures.setupCompleteTestScenario();
-        const orderRequest = OrderFixtures.createOrderRequestWithAmount({
-          userId: testScenario.userId,
-          instrumentId: testScenario.instrumentId,
-          amount: 1000, // $1000 worth of shares
-        });
-
-        // Act
-        const response = await request(app.getHttpServer())
-          .post('/orders')
-          .send(orderRequest)
-          .expect(201);
-
-        // Assert
-        const responseBody = response.body as CreateOrderResponse;
-        expect(responseBody).toHaveProperty('orderId');
-
-        // Verify the order was saved with calculated size
-        const savedOrder = await db
-          .selectFrom('orders')
-          .selectAll()
-          .where('id', '=', responseBody.orderId)
-          .executeTakeFirst();
-
-        expect(savedOrder).toBeDefined();
-        // Size should be calculated as amount / price
-        const expectedSize = Math.floor(1000 / testScenario.marketPrice);
-        expect(savedOrder?.size).toBe(expectedSize);
-      });
+      expect(savedOrder).toBeDefined();
+      expect(savedOrder?.userid).toBe(testScenario.userId);
+      expect(savedOrder?.instrumentid).toBe(testScenario.instrumentId);
+      expect(savedOrder?.side).toBe(Side.BUY);
+      expect(savedOrder?.type).toBe(OrderType.MARKET);
+      expect(savedOrder?.size).toBe(10);
+      expect(parseFloat(savedOrder?.price as string)).toBe(
+        testScenario.marketPrice,
+      );
+      expect(savedOrder?.status).toBe('FILLED');
     });
 
-    describe('Error Paths', () => {
-      it('should return 404 when instrument does not exist', async () => {
-        // Arrange
-        await dbFixtures.setupCompleteTestScenario();
-        const orderRequest =
-          OrderFixtures.createOrderRequestForNonExistentInstrument();
-
-        // Act & Assert
-        const response = await request(app.getHttpServer())
-          .post('/orders')
-          .send(orderRequest)
-          .expect(404);
-
-        const errorBody = response.body as ErrorResponse;
-        expect(errorBody.message).toBe('Instrument not found');
+    it('should create a limit buy order successfully', async () => {
+      // Arrange
+      const testScenario = await dbFixtures.setupCompleteTestScenario();
+      const orderRequest = OrderFixtures.createLimitBuyOrderRequest({
+        userId: testScenario.userId,
+        instrumentId: testScenario.instrumentId,
+        size: 5,
+        price: 95.0, // Below market price
       });
 
-      it('should return 404 when market data is not available', async () => {
-        // Arrange
-        const userId = 1;
-        const instrumentId = 1;
+      // Act
+      const response = await request(app.getHttpServer())
+        .post('/orders')
+        .send(orderRequest)
+        .expect(201);
 
-        // Create instrument but no market data
-        await dbFixtures.createInstrument(instrumentId, 'AAPL', 'Apple Inc.');
-        await dbFixtures.createUserWithCashPosition(userId, 10000);
+      // Assert
+      const responseBody = response.body as CreateOrderResponse;
+      expect(responseBody).toHaveProperty('orderId');
+      expect(typeof responseBody.orderId).toBe('number');
 
-        const orderRequest = OrderFixtures.createMarketBuyOrderRequest({
-          userId,
-          instrumentId,
-        });
+      // Verify the order was saved with limit price
+      const savedOrder = await db
+        .selectFrom('orders')
+        .selectAll()
+        .where('id', '=', responseBody.orderId)
+        .executeTakeFirst();
 
-        // Act & Assert
-        const response = await request(app.getHttpServer())
-          .post('/orders')
-          .send(orderRequest)
-          .expect(404);
+      expect(savedOrder).toBeDefined();
+      expect(parseFloat(savedOrder?.price as string)).toBe(95.0);
+      expect(savedOrder?.type).toBe(OrderType.LIMIT);
+      expect(savedOrder?.status).toBe('NEW'); // Limit orders start as NEW
+    });
 
-        const errorBody = response.body as ErrorResponse;
-        expect(errorBody.message).toBe(
-          'Market data not available for this instrument',
-        );
+    it('should create a market sell order successfully when user has shares', async () => {
+      // Arrange
+      const testScenario = await dbFixtures.setupUserWithShares();
+      const orderRequest = OrderFixtures.createMarketSellOrderRequest({
+        userId: testScenario.userId,
+        instrumentId: testScenario.instrumentId,
+        size: 10,
       });
 
-      it('should return 400 when user has insufficient funds', async () => {
-        // Arrange
-        const testScenario = await dbFixtures.setupCompleteTestScenario();
-        const orderRequest =
-          OrderFixtures.createOrderRequestWithInsufficientFunds({
-            userId: testScenario.userId,
-            instrumentId: testScenario.instrumentId,
-            size: 1000, // Very large order
-          });
+      // Act
+      const response = await request(app.getHttpServer())
+        .post('/orders')
+        .send(orderRequest)
+        .expect(201);
 
-        // Act & Assert
-        const response = await request(app.getHttpServer())
-          .post('/orders')
-          .send(orderRequest)
-          .expect(400);
+      // Assert
+      const responseBody = response.body as CreateOrderResponse;
+      expect(responseBody).toHaveProperty('orderId');
+      expect(typeof responseBody.orderId).toBe('number');
 
-        const errorBody = response.body as ErrorResponse;
-        expect(errorBody.message).toContain('Insufficient funds');
+      // Verify the order was saved
+      const savedOrder = await db
+        .selectFrom('orders')
+        .selectAll()
+        .where('id', '=', responseBody.orderId)
+        .executeTakeFirst();
+
+      expect(savedOrder).toBeDefined();
+      expect(savedOrder?.side).toBe(Side.SELL);
+      expect(savedOrder?.size).toBe(10);
+      expect(parseFloat(savedOrder?.price as string)).toBe(
+        testScenario.marketPrice,
+      );
+    });
+
+    it('should create an order with amount instead of size', async () => {
+      // Arrange
+      const testScenario = await dbFixtures.setupCompleteTestScenario();
+      const orderRequest = OrderFixtures.createOrderRequestWithAmount({
+        userId: testScenario.userId,
+        instrumentId: testScenario.instrumentId,
+        amount: 1000, // $1000 worth of shares
       });
 
-      it('should return 400 when user has insufficient shares for sell order', async () => {
-        // Arrange
-        const testScenario = await dbFixtures.setupUserWithShares();
-        const orderRequest = OrderFixtures.createMarketSellOrderRequest({
+      // Act
+      const response = await request(app.getHttpServer())
+        .post('/orders')
+        .send(orderRequest)
+        .expect(201);
+
+      // Assert
+      const responseBody = response.body as CreateOrderResponse;
+      expect(responseBody).toHaveProperty('orderId');
+
+      // Verify the order was saved with calculated size
+      const savedOrder = await db
+        .selectFrom('orders')
+        .selectAll()
+        .where('id', '=', responseBody.orderId)
+        .executeTakeFirst();
+
+      expect(savedOrder).toBeDefined();
+      // Size should be calculated as amount / price
+      const expectedSize = Math.floor(1000 / testScenario.marketPrice);
+      expect(savedOrder?.size).toBe(expectedSize);
+    });
+
+    it('should return 404 when instrument does not exist', async () => {
+      // Arrange
+      await dbFixtures.setupCompleteTestScenario();
+      const orderRequest =
+        OrderFixtures.createOrderRequestForNonExistentInstrument();
+
+      // Act & Assert
+      const response = await request(app.getHttpServer())
+        .post('/orders')
+        .send(orderRequest)
+        .expect(404);
+
+      const errorBody = response.body as ErrorResponse;
+      expect(errorBody.message).toBe('Instrument not found');
+    });
+
+    it('should return 404 when market data is not available', async () => {
+      // Arrange
+      const userId = 1;
+      const instrumentId = 1;
+
+      // Create instrument but no market data
+      await dbFixtures.createInstrument(instrumentId, 'AAPL', 'Apple Inc.');
+      await dbFixtures.createUserWithCashPosition(userId, 10000);
+
+      const orderRequest = OrderFixtures.createMarketBuyOrderRequest({
+        userId,
+        instrumentId,
+      });
+
+      // Act & Assert
+      const response = await request(app.getHttpServer())
+        .post('/orders')
+        .send(orderRequest)
+        .expect(404);
+
+      const errorBody = response.body as ErrorResponse;
+      expect(errorBody.message).toBe(
+        'Market data not available for this instrument',
+      );
+    });
+
+    it('should return 400 when user has insufficient funds', async () => {
+      // Arrange
+      const testScenario = await dbFixtures.setupCompleteTestScenario();
+      const orderRequest =
+        OrderFixtures.createOrderRequestWithInsufficientFunds({
           userId: testScenario.userId,
           instrumentId: testScenario.instrumentId,
-          size: 200, // More shares than user owns
+          size: 1000, // Very large order
         });
 
-        // Act & Assert
-        const response = await request(app.getHttpServer())
-          .post('/orders')
-          .send(orderRequest)
-          .expect(400);
+      // Act & Assert
+      const response = await request(app.getHttpServer())
+        .post('/orders')
+        .send(orderRequest)
+        .expect(400);
 
-        const errorBody = response.body as ErrorResponse;
-        expect(errorBody.message).toContain('Insufficient shares');
+      const errorBody = response.body as ErrorResponse;
+      expect(errorBody.message).toContain('Insufficient funds');
+    });
+
+    it('should return 400 when user has insufficient shares for sell order', async () => {
+      // Arrange
+      const testScenario = await dbFixtures.setupUserWithShares();
+      const orderRequest = OrderFixtures.createMarketSellOrderRequest({
+        userId: testScenario.userId,
+        instrumentId: testScenario.instrumentId,
+        size: 200, // More shares than user owns
       });
 
-      it('should return 400 when user has no funds available', async () => {
-        // Arrange
-        const userId = 2; // User with no cash position
-        const instrumentId = 1;
+      // Act & Assert
+      const response = await request(app.getHttpServer())
+        .post('/orders')
+        .send(orderRequest)
+        .expect(400);
 
-        // Create instrument and market data but no cash position for user
-        await dbFixtures.createInstrument(instrumentId, 'AAPL', 'Apple Inc.');
-        await dbFixtures.createMarketData(instrumentId, 100.5);
+      const errorBody = response.body as ErrorResponse;
+      expect(errorBody.message).toContain('Insufficient shares');
+    });
 
-        const orderRequest = OrderFixtures.createMarketBuyOrderRequest({
-          userId,
-          instrumentId,
-        });
+    it('should return 400 when user has no funds available', async () => {
+      // Arrange
+      const userId = 2; // User with no cash position
+      const instrumentId = 1;
 
-        // Act & Assert
-        const response = await request(app.getHttpServer())
-          .post('/orders')
-          .send(orderRequest)
-          .expect(404);
+      // Create instrument and market data but no cash position for user
+      await dbFixtures.createInstrument(instrumentId, 'AAPL', 'Apple Inc.');
+      await dbFixtures.createMarketData(instrumentId, 100.5);
 
-        const errorBody = response.body as ErrorResponse;
-        expect(errorBody.message).toBe('No funds available');
+      const orderRequest = OrderFixtures.createMarketBuyOrderRequest({
+        userId,
+        instrumentId,
       });
 
-      it('should return 400 for invalid request data', async () => {
-        // Arrange
-        const invalidRequest = OrderFixtures.createInvalidOrderRequest();
+      // Act & Assert
+      const response = await request(app.getHttpServer())
+        .post('/orders')
+        .send(orderRequest)
+        .expect(404);
 
-        // Act & Assert
-        const response = await request(app.getHttpServer())
-          .post('/orders')
-          .send(invalidRequest)
-          .expect(400);
+      const errorBody = response.body as ErrorResponse;
+      expect(errorBody.message).toBe('No funds available');
+    });
 
-        const errorBody = response.body as ErrorResponse;
-        expect(errorBody.message).toBeDefined();
-        expect(Array.isArray(errorBody.message)).toBe(true);
-      });
+    it('should return 400 for invalid request data', async () => {
+      // Arrange
+      const invalidRequest = OrderFixtures.createInvalidOrderRequest();
+
+      // Act & Assert
+      const response = await request(app.getHttpServer())
+        .post('/orders')
+        .send(invalidRequest)
+        .expect(400);
+
+      const errorBody = response.body as ErrorResponse;
+      expect(errorBody.message).toBeDefined();
+      expect(Array.isArray(errorBody.message)).toBe(true);
     });
   });
 });

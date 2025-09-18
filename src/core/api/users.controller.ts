@@ -1,5 +1,5 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { PortfolioApplicationService } from '../application/services/portfolio.service';
+import { PortfolioApplicationService } from '../application/services/portfolio.application.service';
 import { GetPortfolioResponseDto } from './dtos/get-portfolio.response.dto';
 import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 
